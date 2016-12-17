@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 //Logger
 var myLogClass = require('./utils/logger');
 var logger = new myLogClass();
+var morgan = require('morgan');
 //express-validations
 var expressValidator = require('express-validator');
 
@@ -17,6 +18,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(expressValidator()); // this line must be immediately after any of the bodyParser middlewares!
+app.use(morgan('combined')); //log de request
 
 //crea el string de conexion de mongoDBs
 var urlMongoose = config.Mongo.client + "://" + config.Mongo.host + ":" + config.Mongo.port + "/" + config.Mongo.dbName;

@@ -25,7 +25,6 @@ mongoose.Promise = global.Promise;
 
 //GET - Retorna todos los empleados de la base de datos
 exports.findAllEmployees = function(req, res) {  
-    console.log('GET /employees');
     Employee.find(function(err, emp) {
     	//en caso de error se loguea la excepcion y se devueve el error al usuario
 	    if(err)
@@ -45,7 +44,6 @@ exports.findAllEmployees = function(req, res) {
 
 //GET - Retorna a un empleado con el id especificado
 exports.findById = function(req, res) {
-    console.log('GET /api/employee/' + req.params.id);
 	//verfica que el id enviado sea un id valido  
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
@@ -68,9 +66,6 @@ exports.findById = function(req, res) {
 
 //POST - Inserta un nuevo empleado en la base de datos
 exports.addEmployee = function(req, res) {  
-    //loguea request
-    console.log('POST /api/employee/');
-    console.log(req.body);
     //valida el requerimiento
     req.check(empValidationsSchema);
     //getValidationResult devuelve una promesa
