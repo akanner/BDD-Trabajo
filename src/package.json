@@ -1,0 +1,18 @@
+{
+  "name": "BBDD2016",
+  "main": "server.js",
+  "scripts": {
+    "start": "NODE_ENV=production node ./bin/server",
+    "test": "NODE_ENV=test mocha"
+  },
+  "dependencies": {
+    "async": "^2.0.1",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "log4js": "^0.6.38",
+    "mongo-sanitize": "^1.0.0",
+    "mongoose": "^4.5.7",
+    "request": "^2.74.0"
+  }
+}
