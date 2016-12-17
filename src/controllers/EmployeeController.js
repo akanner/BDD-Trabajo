@@ -2,20 +2,26 @@
  * Controlador de los empleados
  *
  */
-
+//REQUIRES------------------------------------------------------------------------------
+//models
 var Employee  = require('../models/employee');
 var mongoose = require('mongoose');
 //Logger
 var MyLogClass = require('../utils/logger');
-var logger = new MyLogClass("employeeControllerLogger");
+
 //helper de seguridad
 var SecurityHelper = require('../utils/securityHelper');
-var security = new SecurityHelper();
+
 //esquema de validaciones de express-validations
 var empValidationsSchema = require("./validations/employeeSchema");
 var util = require('util');
+//end requires---------------------------------------------------------------------------
+var logger = new MyLogClass("employeeControllerLogger");
+var security = new SecurityHelper();
 //usamos las promesas incluidas en ES6, las promesas de mongoDB estan deprecadas!!
 mongoose.Promise = global.Promise;
+
+//VERBOS
 
 //GET - Retorna todos los empleados de la base de datos
 exports.findAllEmployees = function(req, res) {  
@@ -61,7 +67,7 @@ exports.findById = function(req, res) {
 };
 
 //POST - Inserta un nuevo empleado en la base de datos
-exports.addTVEmployee = function(req, res) {  
+exports.addEmployee = function(req, res) {  
     //loguea request
     console.log('POST /api/employee/');
     console.log(req.body);
@@ -84,7 +90,7 @@ exports.addTVEmployee = function(req, res) {
 };
 
 
-
+//FIN VERBOS
 
 
 /**
