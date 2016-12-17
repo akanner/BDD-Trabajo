@@ -6,7 +6,7 @@ var router = express.Router();
 // '/api/emplyees'
 router.route('/')
     .get(empController.findAllEmployees)
-    //.post(empController.createApp);
+    .post(empController.addTVEmployee);
 
 // '/api/emplyees/:id'
 router.route('/:id')

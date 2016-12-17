@@ -13,6 +13,7 @@
     "log4js": "^0.6.38",
     "mongo-sanitize": "^1.0.0",
     "mongoose": "^4.5.7",
-    "request": "^2.74.0"
+    "request": "^2.74.0",
+    "express-validator": "^3.1.0"
   }
 }
