@@ -18,6 +18,8 @@ var util = require('util');
 //end requires---------------------------------------------------------------------------
 var logger = new MyLogClass("employeeControllerLogger");
 var security = new SecurityHelper();
+//formateo de respuestas
+var responseFormatter = require('../utils/responseFormatter');
 //usamos las promesas incluidas en ES6, las promesas de mongoDB estan deprecadas!!
 mongoose.Promise = global.Promise;
 
@@ -31,12 +33,12 @@ exports.findAllEmployees = function(req, res) {
 	    {
 	    	logger.error("error obteniendo a los empleados de la base de datos");
 	    	logger.error(err.message);
-	    	res.send(500, err.message);
+	    	res.status(500).send(responseFormatter.formatResponse(500, err.message));
 	    } 
 	    else
     	{
     		//si no hay errores se devuelve la coleccion de empleados al usuario
-    		res.status(200).json(emp);
+    		res.status(200).json(responseFormatter.formatResponse(200, emp));
     	}
 	        
     });
@@ -48,7 +50,7 @@ exports.findById = function(req, res) {
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
-        return res.status(412).json({message: "Id inválido"});
+        return res.status(412).json(responseFormatter.formatResponse(412,"Invalid Id"));
     }
 
     Employee.findById(validId, function(err, emp) {
@@ -57,10 +59,10 @@ exports.findById = function(req, res) {
     {
     	logger.error("error obteniendo al empleado con ID: " + validId);
     	logger.error(err.message);
-    	return res.status(500).json(err.message);
+    	return res.status(500).json(responseFormatter.formatResponse(500, err.message));
     }
     //si no hay errores se devuelve al usuario consultado 
-    res.status(200).json(emp);
+    res.status(200).json(responseFormatter.formatResponse(200,emp));
     });
 };
 
@@ -72,14 +74,14 @@ exports.addEmployee = function(req, res) {
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
-        return res.status(412).json({message: "Id inválido"});
+        return res.status(412).json(responseFormatter.formatResponse(412,"Invalid Id"));
     }
     //getValidationResult devuelve una promesa
     req.getValidationResult().then(function(result) {
         if (!result.isEmpty()) 
         {
           //si hay algun error se le informa al usuario
-          res.status(400).send('There have been validation errors: ' + util.inspect(result.array()));
+          res.status(400).json(responseFormatter.formatResponse(400,'There have been validation errors: ' + util.inspect(result.array())));
         }
         else
         {
@@ -100,7 +102,7 @@ exports.updateEmployee = function(req, res) {
         if (!result.isEmpty()) 
         {
           //si hay algun error se le informa al usuario
-          res.status(400).send('There have been validation errors: ' + util.inspect(result.array()));
+          res.status(400).json(responseFormatter.formatResponse(400,'There have been validation errors: ' + util.inspect(result.array())));
         }
         else
         {
@@ -119,32 +121,32 @@ exports.deleteEmployee = function(req, res) {
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
-        return res.status(412).json({message: "Id inválido"});
+        return res.status(412).json(responseFormatter.formatResponse(412,"Invalid id"));
     }
     Employee.findById(req.params.id, function(err, emp) {
         if(err)
         {
              //si hay algun error se le informa al usuario
             logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
-            res.status(500).send(err.message);
+            res.status(500).json(responseFormatter.formatResponse(500,err.message));
             return;
         }
         if(!emp)
         {
             //si no existe el empleado
-             res.status(404).send("there is no employee with id: " + req.params.id);
+             res.status(404).json(responseFormatter.formatResponse(404,"there is no employee with id: " + req.params.id));
             return;
         }
         //intenta borrar al empleado
         try
         {
           removeEmployee(emp);
-          res.status(200).json(emp);
+          res.status(200).json(responseFormatter.formatResponse(200,emp));
         }
         catch(err)
         {
             logger.error(err.message);
-            res.status(500).send(err.message);
+            res.status(500).json(responseFormatter.formatResponse(500,err.message));
         }
        
     });
@@ -201,7 +203,7 @@ function updateEmployee(req,res)
          {
             //si hay algun error se le informa al usuario
             logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
-            res.status(500).send(err.message);
+            res.status(500).json(responseFormatter.formatResponse(500,err.message));
             return;
          }
          if(!emp)
@@ -231,10 +233,10 @@ function saveEmployeeAndInformResult(emp,res)
         {
             //si hay algun error se loguea la excepcion y se informa al usuario
             logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
-            res.status(500).send( err.message);
+            res.status(500).json(responseFormatter.formatResponse(500, err.message));
             return; 
         }
         //si sale todo ok se le envia el nuevo empleado al usuario
-        res.status(200).json(emp);
+        res.status(200).json(responseFormatter.formatResponse(200,emp));
     });
 }
