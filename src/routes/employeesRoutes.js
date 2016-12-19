@@ -11,7 +11,7 @@ router.route('/')
 // '/api/emplyees/:id'
 router.route('/:id')
     .get(empController.findById)
-    //.delete(empController.deleteApp)
-    //.put(empController.updateApp);
+    .delete(empController.deleteEmployee)
+    .put(empController.updateEmployee);
 
 module.exports = router;
