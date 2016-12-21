@@ -16,7 +16,7 @@ var SecurityHelper = require('../utils/securityHelper');
 var empValidationsSchema = require("./validations/employeeSchema");
 var util = require('util');
 //end requires---------------------------------------------------------------------------
-var logger = new MyLogClass("employeeControllerLogger");
+var logger = new MyLogClass();
 var security = new SecurityHelper();
 //formateo de respuestas
 var responseFormatter = require('../utils/responseFormatter');
@@ -66,16 +66,12 @@ exports.findById = function(req, res) {
     });
 };
 
+
+
 //POST - Inserta un nuevo empleado en la base de datos
 exports.addEmployee = function(req, res) {  
     //valida el requerimiento
     req.check(empValidationsSchema);
-    //verfica que el id enviado sea un id valido  
-    var validId = security.getValidId(req.params.id);
-    if (validId == false) 
-    {
-        return res.status(412).json(responseFormatter.formatResponse(412,"Invalid Id"));
-    }
     //getValidationResult devuelve una promesa
     req.getValidationResult().then(function(result) {
         if (!result.isEmpty()) 
@@ -92,11 +88,19 @@ exports.addEmployee = function(req, res) {
     });
 };
 
+
+
 //PUT - Actualiza un empleado
 exports.updateEmployee = function(req, res) {  
 
      //valida el requerimiento
     req.check(empValidationsSchema);
+    //verfica que el id enviado sea un id valido  
+    var validId = security.getValidId(req.params.id);
+    if (validId == false) 
+    {
+        return res.status(412).json(responseFormatter.formatResponse(412,"Invalid id"));
+    }
      //getValidationResult devuelve una promesa
     req.getValidationResult().then(function(result) {
         if (!result.isEmpty()) 
@@ -111,6 +115,8 @@ exports.updateEmployee = function(req, res) {
         }
     });
 };
+
+
 
 
 //DELETE - Elimina un empleado de la base de datos
@@ -155,23 +161,7 @@ exports.deleteEmployee = function(req, res) {
 
 //FIN VERBOS
 
-/**
- * Elimina el empleado de la base de datos
- *
- * @param emp   Entidad Employee a eliminar
- *
- */
-function removeEmployee(emp)
-{
-    var error;
-     emp.remove(function(err) {
-        error = err; //lanza excepcion
-     });
-    if(error)
-    {
-        throw error;
-    }
-}
+
 /**
  * Crea el empleado nuevo y devuelve la respuesta al usuario
  * 
@@ -186,7 +176,19 @@ function createEmployee(req,res)
         ename:     req.body.ename,
     });
     //trata de guardar al empleado recien creado
-    saveEmployeeAndInformResult(emp,res);
+    try
+    {
+        saveEmployee(emp);
+        //si sale todo ok se le envia el nuevo empleado al usuario
+        res.status(200).json(responseFormatter.formatResponse(200,emp));
+    }
+    catch(ex)
+    {
+        logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
+        logger.error(ex.message);
+        res.status(500).json(responseFormatter.formatResponse(500, ex.message));
+    }
+
 }
 /**
  * Actualiza un empleado en la base de datos
@@ -214,29 +216,60 @@ function updateEmployee(req,res)
          emp.title = security.cleanup(req.body.title);
          emp.ename = security.cleanup(req.body.ename);
          //guarda los cambios
-         saveEmployeeAndInformResult(emp,res);
+
+
+         try
+         {
+            saveEmployee(emp);
+            //si sale todo ok se le envia el nuevo empleado al usuario
+            res.status(200).json(responseFormatter.formatResponse(200,emp));
+         }
+         catch(ex)
+         {
+            logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
+            logger.error(ex.message);
+            res.status(500).json(responseFormatter.formatResponse(500, ex.message));
+         }
+         
      });
     
 
 }
 /**
- * Guarda el usuario y escribe el resultado en la respuesta HTTP
+ * Guarda el usuario en la base de datos
  *
  * @param emp   Entidad Employee a guardar
- * @param res   Objeto HTTP Response
  *
  */
-function saveEmployeeAndInformResult(emp,res)
+function saveEmployee(emp)
 {
+    var error;
     emp.save(function(err, emp) {
         if(err) 
         {
-            //si hay algun error se loguea la excepcion y se informa al usuario
-            logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
-            res.status(500).json(responseFormatter.formatResponse(500, err.message));
-            return; 
+            error = err; //lanza excepcion
         }
-        //si sale todo ok se le envia el nuevo empleado al usuario
-        res.status(200).json(responseFormatter.formatResponse(200,emp));
     });
+
+    if(error)
+    {
+        throw error;
+    }
+}
+/**
+ * Elimina el empleado de la base de datos
+ *
+ * @param emp   Entidad Employee a eliminar
+ *
+ */
+function removeEmployee(emp)
+{
+    var error;
+     emp.remove(function(err) {
+        error = err; //lanza excepcion
+     });
+    if(error)
+    {
+        throw error;
+    }
 }
