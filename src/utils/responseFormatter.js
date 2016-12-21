@@ -15,10 +15,45 @@
   * @param obj payload	Respuesta devuelta por el servidor
   *
   */
- exports.formatResponse = function(httpCode,payload)
+exports.formatResponse = function(httpCode,payload)
  {
     var jsonResponse = {};
     jsonResponse["status"] = httpCode;
     jsonResponse["message"] = payload;
     return jsonResponse;
+ }
+
+ function formatResponse(httpCode,payload)
+ {
+    var jsonResponse = {};
+    jsonResponse["status"] = httpCode;
+    jsonResponse["message"] = payload;
+    return jsonResponse;
+ }
+
+ function sendResponse(res,httpCode,payload)
+ {
+    res.status(httpCode).json(formatResponse(httpCode,payload));
+ }
+/**
+ * Devuelve una respuesta 404 al usuario
+ *
+ * @param res       HTTP Response
+ * @param payload   informacion a enviar
+ *
+ */
+ exports.send404Response = function(res,payload)
+ {
+     sendResponse(res,404,payload);
+ }
+/**
+ * devuelve una respuesta con codigo http 500
+ *
+ * @param res     HTTP Response
+ * @param payload informacion a enviar
+ *
+ */
+ exports.send500Response = function(res,payload)
+ {
+    sendResponse(res,500,payload);
  }

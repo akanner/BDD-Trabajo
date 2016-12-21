@@ -28,12 +28,13 @@ mongoose.Promise = global.Promise;
 //GET - Retorna todos los empleados de la base de datos
 exports.findAllEmployees = function(req, res) {  
     Employee.find(function(err, emp) {
+        err = new Error("aaaaaaaaa");
     	//en caso de error se loguea la excepcion y se devueve el error al usuario
 	    if(err)
 	    {
 	    	logger.error("error obteniendo a los empleados de la base de datos");
 	    	logger.error(err.message);
-	    	res.status(500).send(responseFormatter.formatResponse(500, err.message));
+	    	responseFormatter.send500Response(res,err.message);
 	    } 
 	    else
     	{
@@ -59,7 +60,8 @@ exports.findById = function(req, res) {
     {
     	logger.error("error obteniendo al empleado con ID: " + validId);
     	logger.error(err.message);
-    	return res.status(500).json(responseFormatter.formatResponse(500, err.message));
+    	responseFormatter.send500Response(res,err.message);
+        return;
     }
     //si no hay errores se devuelve al usuario consultado 
     res.status(200).json(responseFormatter.formatResponse(200,emp));
@@ -134,26 +136,17 @@ exports.deleteEmployee = function(req, res) {
         {
              //si hay algun error se le informa al usuario
             logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
-            res.status(500).json(responseFormatter.formatResponse(500,err.message));
+            responseFormatter.send500Response(res,err.message);
             return;
         }
         if(!emp)
         {
             //si no existe el empleado
-             res.status(404).json(responseFormatter.formatResponse(404,"there is no employee with id: " + req.params.id));
+            responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
             return;
         }
         //intenta borrar al empleado
-        try
-        {
-          removeEmployee(emp);
-          res.status(200).json(responseFormatter.formatResponse(200,emp));
-        }
-        catch(err)
-        {
-            logger.error(err.message);
-            res.status(500).json(responseFormatter.formatResponse(500,err.message));
-        }
+        removeEmployeeAndWriteResponse(emp,res);
        
     });
 };
@@ -176,18 +169,7 @@ function createEmployee(req,res)
         ename:     req.body.ename,
     });
     //trata de guardar al empleado recien creado
-    try
-    {
-        saveEmployee(emp);
-        //si sale todo ok se le envia el nuevo empleado al usuario
-        res.status(200).json(responseFormatter.formatResponse(200,emp));
-    }
-    catch(ex)
-    {
-        logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
-        logger.error(ex.message);
-        res.status(500).json(responseFormatter.formatResponse(500, ex.message));
-    }
+    saveEmployeeAndWriteResponse(emp,res);
 
 }
 /**
@@ -205,71 +187,72 @@ function updateEmployee(req,res)
          {
             //si hay algun error se le informa al usuario
             logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
-            res.status(500).json(responseFormatter.formatResponse(500,err.message));
+            responseFormatter.send500Response(res,err.message);
             return;
          }
          if(!emp)
          {
-            res.status(404).send("there is no employee with id: " + req.params.id);
+            responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
             return;
          }
          emp.title = security.cleanup(req.body.title);
          emp.ename = security.cleanup(req.body.ename);
+
          //guarda los cambios
+        saveEmployeeAndWriteResponse(emp,res);
 
 
-         try
-         {
-            saveEmployee(emp);
-            //si sale todo ok se le envia el nuevo empleado al usuario
-            res.status(200).json(responseFormatter.formatResponse(200,emp));
-         }
-         catch(ex)
-         {
-            logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
-            logger.error(ex.message);
-            res.status(500).json(responseFormatter.formatResponse(500, ex.message));
-         }
          
      });
     
 
 }
 /**
- * Guarda el usuario en la base de datos
+ * Guarda el usuario en la base de datos y escribe en la respuesta
+ *
+ * TODO: buscar una mejor manera de hacer esto, este metodo no deberia escribir la respuesta
  *
  * @param emp   Entidad Employee a guardar
  *
  */
-function saveEmployee(emp)
+function saveEmployeeAndWriteResponse(emp,res)
 {
-    var error;
     emp.save(function(err, emp) {
         if(err) 
         {
-            error = err; //lanza excepcion
+            logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
+            logger.error(err.message);
+            responseFormatter.send500Response(res,err.message);
+        }
+        else
+        {
+            //si sale todo ok se le envia el nuevo empleado al usuario
+            res.status(200).json(responseFormatter.formatResponse(200,emp));
         }
     });
-
-    if(error)
-    {
-        throw error;
-    }
 }
 /**
  * Elimina el empleado de la base de datos
  *
+ * TODO: buscar una mejor manera de hacer esto, este metodo no deberia escribir la respuesta
+ *
  * @param emp   Entidad Employee a eliminar
  *
  */
-function removeEmployee(emp)
+function removeEmployeeAndWriteResponse(emp,res)
 {
-    var error;
      emp.remove(function(err) {
-        error = err; //lanza excepcion
+        if(err) 
+        {
+            logger.error("no se pudo eliminar el empleado: " + JSON.stringify(emp));
+            logger.error(err.message);
+            responseFormatter.send500Response(res,err.message);
+        }
+        else
+        {
+            //si sale todo ok se le envia el nuevo empleado al usuario
+            res.status(200).json(responseFormatter.formatResponse(200,emp));
+        }
      });
-    if(error)
-    {
-        throw error;
-    }
+
 }
