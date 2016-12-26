@@ -4,7 +4,7 @@
  */
 //REQUIRES------------------------------------------------------------------------------
 //models
-var Employee  = require('../models/employee');
+var Project  = require('../models/project');
 var mongoose = require('mongoose');
 //Logger
 var MyLogClass = require('../utils/logger');
@@ -13,7 +13,7 @@ var MyLogClass = require('../utils/logger');
 var SecurityHelper = require('../utils/securityHelper');
 
 //esquema de validaciones de express-validations
-var empValidationsSchema = require("./validations/employeeSchema");
+var projValidationsSchema = require("./validations/projectSchema");
 var util = require('util');
 //end requires---------------------------------------------------------------------------
 var logger = new MyLogClass();
@@ -23,28 +23,26 @@ var responseFormatter = require('../utils/responseFormatter');
 //usamos las promesas incluidas en ES6, las promesas de mongoDB estan deprecadas!!
 mongoose.Promise = global.Promise;
 
-//VERBOS
-
-//GET - Retorna todos los empleados de la base de datos
-exports.findAllEmployees = function(req, res) {  
-    Employee.find(function(err, emp) {
+//GET - Retorna todos los proyectos de la base de datos
+exports.findAllProjects = function(req, res) {  
+    Project.find(function(err, proj) {
     	//en caso de error se loguea la excepcion y se devueve el error al usuario
 	    if(err)
 	    {
-	    	logger.error("error obteniendo a los empleados de la base de datos");
+	    	logger.error("error obteniendo los proyectos de la base de datos");
 	    	logger.error(err.message);
 	    	responseFormatter.send500Response(res,err.message);
 	    } 
 	    else
     	{
-    		//si no hay errores se devuelve la coleccion de empleados al usuario
-    		responseFormatter.send200Response(res,emp);
+    		//si no hay errores se devuelve la coleccion de proyectos al usuario
+    		responseFormatter.send200Response(res,proj);
     	}
 	        
     });
 };
 
-//GET - Retorna a un empleado con el id especificado
+//GET - Retorna un proyecto con el id especificado
 exports.findById = function(req, res) {
 	//verfica que el id enviado sea un id valido  
     var validId = security.getValidId(req.params.id);
@@ -53,31 +51,29 @@ exports.findById = function(req, res) {
         return responseFormatter.send412Response(res,"Invalid id");
     }
 
-    Employee.findById(validId, function(err, emp) {
+    Project.findById(validId, function(err, emp) {
     //si hay un error se loguea la excepcion y se informa al usuario
     if(err)
     {
-    	logger.error("error obteniendo al empleado con ID: " + validId);
+    	logger.error("error obteniendo al proyecto con ID: " + validId);
     	logger.error(err.message);
     	responseFormatter.send500Response(res,err.message);
         return;
     }
     if(!emp)
     {
-        responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
+        responseFormatter.send404Response(res,"there is no project with id: " + req.params.id);
         return;
     }
-    //si no hay errores se devuelve al usuario consultado 
+    //si no hay errores se devuelve al proyecto consultado 
     responseFormatter.send200Response(res,emp);
     });
 };
 
-
-
-//POST - Inserta un nuevo empleado en la base de datos
-exports.addEmployee = function(req, res) {  
+//POST - Inserta un nuevo proyecto en la base de datos
+exports.addProject = function(req, res) {  
     //valida el requerimiento
-    req.check(empValidationsSchema);
+    req.check(projValidationsSchema);
     //getValidationResult devuelve una promesa
     req.getValidationResult().then(function(result) {
         if (!result.isEmpty()) 
@@ -87,20 +83,18 @@ exports.addEmployee = function(req, res) {
         }
         else
         {
-            //si no hay errores se crea el nuevo empleado
-            createEmployee(req,res)
+            //si no hay errores se crea el nuevo proyecto
+            createProject(req,res)
         }
 
     });
 };
 
-
-
-//PUT - Actualiza un empleado
-exports.updateEmployee = function(req, res) {  
+//PUT - Actualiza un proyecto
+exports.updateProject = function(req, res) {  
 
      //valida el requerimiento
-    req.check(empValidationsSchema);
+    req.check(projValidationsSchema);
     //verfica que el id enviado sea un id valido  
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
@@ -116,43 +110,26 @@ exports.updateEmployee = function(req, res) {
         }
         else
         {
-            //si no hay errores se crea el nuevo empleado
-            updateEmployee(req,res)
+            //si no hay errores se crea el nuevo proyecto
+            amendProject(req,res);
         }
     });
 };
 
-
-
-
-//DELETE - Elimina un empleado de la base de datos
-exports.deleteEmployee = function(req, res) {  
+//DELETE - Elimina un proyecto de la base de datos
+exports.deleteProject = function(req, res) {  
      //valida el requerimiento
-    req.check(empValidationsSchema);
+    req.check(projValidationsSchema);
     //verfica que el id enviado sea un id valido  
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
         return responseFormatter.send412Response(res,"Invalid id");
     }
-    Employee.findById(req.params.id, function(err, emp) {
-        if(err)
-        {
-             //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
-            responseFormatter.send500Response(res,err.message);
-            return;
-        }
-        if(!emp)
-        {
-            //si no existe el empleado
-            responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
-            return;
-        }
-        //intenta borrar al empleado
-        removeEmployeeAndWriteResponse(emp,res);
-       
-    });
+    else
+    {
+    	return removeProject(req,res);
+    }
 };
 
 
@@ -160,50 +137,51 @@ exports.deleteEmployee = function(req, res) {
 
 
 /**
- * Crea el empleado nuevo y devuelve la respuesta al usuario
+ * Crea el proyecto nuevo y devuelve la respuesta al usuario
  * 
  * @param req Objeto Request
  * @param res Objeto Response
  */
-function createEmployee(req,res)
+function createProject(req,res)
 {
-    //si el requerimiento es valido crea el nuevo empleado
-    var emp = new Employee({
-        title:    req.body.title,
-        ename:     req.body.ename,
+    //si el requerimiento es valido crea el nuevo proyecto
+    var proj = new Project({
+        pname:    security.cleanup(req.body.pname),
+        budget:   security.cleanup(req.body.budget),
     });
-    //trata de guardar al empleado recien creado
-    saveEmployeeAndWriteResponse(emp,res);
+    //trata de guardar al proyecto recien creado
+    saveProjectAndWriteResponse(proj,res);
 
 }
+
 /**
- * Actualiza un empleado en la base de datos
+ * Actualiza un proyecto en la base de datos
  *
  * @param req   Objeto HTTP Request
  * @param res   Objeto HTTP Response
  *
  */
-function updateEmployee(req,res)
+function amendProject(req,res)
 {
-     //busca el empleado en la base de datos
-     var emp = Employee.findById(req.params.id,function(err,emp){
+     //busca el project en la base de datos
+     var proj = Project.findById(req.params.id,function(err,proj){
          if(err)
          {
             //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
+            logger.error("no se pudo encontrar al proyecto con id " + req.params.id + " : " + err);
             responseFormatter.send500Response(res,err.message);
             return;
          }
-         if(!emp)
+         if(!proj)
          {
-            responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
+            responseFormatter.send404Response(res,"there is no project with id: " + req.params.id);
             return;
          }
-         emp.title = security.cleanup(req.body.title);
-         emp.ename = security.cleanup(req.body.ename);
+         proj.pname = security.cleanup(req.body.pname);
+         proj.budget = security.cleanup(req.body.budget);
 
          //guarda los cambios
-        saveEmployeeAndWriteResponse(emp,res);
+        saveProjectAndWriteResponse(proj,res);
 
 
          
@@ -211,51 +189,75 @@ function updateEmployee(req,res)
     
 
 }
+
+function removeProject(req,res)
+{
+ Project.findById(req.params.id, function(err, proj) {
+    if(err)
+    {
+         //si hay algun error se le informa al usuario
+        logger.error("no se pudo encontrar al proyecto con id " + req.params.id + " : " + err);
+        responseFormatter.send500Response(res,err.message);
+        return;
+    }
+    if(!proj)
+    {
+        //si no existe el proyecto
+        responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
+        return;
+    }
+    //intenta borrar al empleado
+    removeProjectAndWriteResponse(proj,res);
+   
+    });
+}
+
 /**
- * Guarda el usuario en la base de datos y escribe en la respuesta
+ * Guarda el proyecto en la base de datos y escribe en la respuesta
  *
  * TODO: buscar una mejor manera de hacer esto, este metodo no deberia escribir la respuesta
  *
- * @param emp   Entidad Employee a guardar
+ * @param proj   Entidad Project a guardar
  *
  */
-function saveEmployeeAndWriteResponse(emp,res)
+function saveProjectAndWriteResponse(proj,res)
 {
-    emp.save(function(err, emp) {
+    proj.save(function(err, proj) {
         if(err) 
         {
-            logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
+            logger.error("no se pudo guardar al proyecto: " + JSON.stringify(proj));
             logger.error(err.message);
             responseFormatter.send500Response(res,err.message);
         }
         else
         {
             //si sale todo ok se le envia el nuevo empleado al usuario
-            responseFormatter.send200Response(res,emp);
+            responseFormatter.send200Response(res,proj);
         }
     });
 }
+
 /**
- * Elimina el empleado de la base de datos
+ * Elimina a un proyecto de la base de datos
  *
  * TODO: buscar una mejor manera de hacer esto, este metodo no deberia escribir la respuesta
  *
- * @param emp   Entidad Employee a eliminar
+ * @param emp   Entidad Project a eliminar
  *
  */
-function removeEmployeeAndWriteResponse(emp,res)
+function removeProjectAndWriteResponse(proj,res)
 {
-     emp.remove(function(err) {
+     proj.remove(function(err) {
         if(err) 
         {
-            logger.error("no se pudo eliminar el empleado: " + JSON.stringify(emp));
+            logger.error("no se pudo eliminar el proyecto: " + JSON.stringify(proj));
             logger.error(err.message);
             responseFormatter.send500Response(res,err.message);
         }
         else
         {
-            //si sale todo ok se le envia el nuevo empleado al usuario
-            responseFormatter.send200Response(res,emp);
+            //si sale todo ok se le envia el nuevo proyecto al usuario
+            responseFormatter.send200Response(res,proj);
         }
      });
 
