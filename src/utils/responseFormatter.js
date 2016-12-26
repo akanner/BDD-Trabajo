@@ -47,6 +47,28 @@ exports.formatResponse = function(httpCode,payload)
      sendResponse(res,404,payload);
  }
 /**
+ * Devuelve una respuesta 412 al usuario
+ *
+ * @param res       HTTP Response
+ * @param payload   informacion a enviar
+ *
+ */
+ exports.send412Response = function(res,payload)
+ {
+   sendResponse(res,412,payload);
+ }
+/**
+ * Devuelve una respuesta 400 al usuario
+ *
+ * @param res       HTTP Response
+ * @param payload   informacion a enviar
+ *
+ */
+ exports.send400Response = function(res,payload)
+ {
+   sendResponse(res,400,payload);
+ }
+/**
  * devuelve una respuesta con codigo http 500
  *
  * @param res     HTTP Response
@@ -56,4 +78,15 @@ exports.formatResponse = function(httpCode,payload)
  exports.send500Response = function(res,payload)
  {
     sendResponse(res,500,payload);
+ }
+/**
+ * devuelve una respuesta con codigo http 200
+ *
+ * @param res     HTTP Response
+ * @param payload informacion a enviar
+ *
+ */
+ exports.send200Response = function(res,payload)
+ {
+   sendResponse(res,200,payload);
  }
