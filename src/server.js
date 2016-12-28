@@ -36,10 +36,12 @@ var port = process.env.PORT || 8000;
 //registra las rutas
 var empsRoutes = require('./routes/employeesRoutes');
 var projRoutes = require("./routes/projectsRoutes");
+var asgRoutes = require("./routes/assignmentsRoutes");
 var indexRoute = require("./routes/indexRoutes");
 app.use('/api',indexRoute)
 app.use('/api/employee', empsRoutes);
 app.use('/api/project', projRoutes);
+app.use('/api/assignment', asgRoutes);
 // Start server
 app.listen(port, function() {
   console.log("Node server running on http://localhost:" + port);
