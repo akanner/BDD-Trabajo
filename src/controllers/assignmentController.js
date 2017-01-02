@@ -11,7 +11,8 @@ var MyLogClass = require('../utils/logger');
 
 //helper de seguridad
 var SecurityHelper = require('../utils/securityHelper');
-
+//controlador generico
+var genericController = require('./genericController');
 //esquema de validaciones de express-validations
 var asgValidationsSchema = require("./validations/assignmentSchema");
 var util = require('util');
@@ -24,22 +25,15 @@ var responseFormatter = require('../utils/responseFormatter');
 mongoose.Promise = global.Promise;
 
 //GET - Retorna las asignaciones de un determinado proyecto
-exports.findAllAssignments = function(req, res) {  
-    assignment.find(function(err, asg) {
-    	//en caso de error se loguea la excepcion y se devueve el error al usuario
-	    if(err)
-	    {
-	    	logger.error("error obteniendo los asignaciones de la base de datos");
-	    	logger.error(err.message);
-	    	responseFormatter.send500Response(res,err.message);
-	    } 
-	    else
-    	{
-    		//si no hay errores se devuelve la coleccion de asignaciones al usuario
-    		responseFormatter.send200Response(res,asg);
-    	}
-	        
-    });
+exports.findAllAssignments = function(req, res) {
+    genericController.getAllEntities(assignment,["emp_id","proj_id"],res,function(err,res){
+        logger.error("error obteniendo los asignaciones de la base de datos");
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(res,asg){
+        //si no hay errores se devuelve la coleccion de asignaciones al usuario
+        responseFormatter.send200Response(res,asg);
+    });  
 };
 
 //GET - Retorna una asignacion con el id especificado
@@ -50,24 +44,13 @@ exports.findById = function(req, res) {
     {
         return responseFormatter.send412Response(res,"Invalid id");
     }
-
-    assignment.findById(validId, function(err, emp) {
-    //si hay un error se loguea la excepcion y se informa al usuario
-    if(err)
+    else
     {
-    	logger.error("error obteniendo la asignacion con ID: " + validId);
-    	logger.error(err.message);
-    	responseFormatter.send500Response(res,err.message);
-        return;
+        //si el id es valido busca en la base de datos una asignacion con ese id
+        return getAssignmentAndProcessResult(validId,res,function(res,asg){
+            responseFormatter.send200Response(res,asg);
+        })
     }
-    if(!emp)
-    {
-        responseFormatter.send404Response(res,"there is no assignment with id: " + req.params.id);
-        return;
-    }
-    //si no hay errores se devuelve la asignacion consultado 
-    responseFormatter.send200Response(res,emp);
-    });
 };
 
 //POST - Inserta una nueva asignacion en la base de datos
@@ -165,54 +148,38 @@ function createAssignment(req,res)
  */
 function amendAssignment(req,res)
 {
-     //busca la Assignment en la base de datos
-     var asg = assignment.findById(req.params.id,function(err,asg){
-         if(err)
-         {
-            //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar la asignacion con id " + req.params.id + " : " + err);
-            responseFormatter.send500Response(res,err.message);
-            return;
-         }
-         if(!asg)
-         {
-            responseFormatter.send404Response(res,"there is no assignment with id: " + req.params.id);
-            return;
-         }
+    getAssignmentAndProcessResult(req.params.id,res,function(res,asg){
          asg.emp_id = security.cleanup(req.body.emp_id);
          asg.proj_id = security.cleanup(req.body.proj_id);
          asg.responsibilities = security.cleanup(req.body.responsibilities),
          asg.duration = security.cleanup(req.body.duration)
          //guarda los cambios
         saveAssignmentAndWriteResponse(asg,res);
-
-
-         
-     });
-    
-
+    });
 }
 
 function removeAssignment(req,res)
 {
- assignment.findById(req.params.id, function(err, asg) {
-    if(err)
-    {
-         //si hay algun error se le informa al usuario
-        logger.error("no se pudo encontrar la asignacion con id " + req.params.id + " : " + err);
-        responseFormatter.send500Response(res,err.message);
-        return;
-    }
-    if(!asg)
-    {
-        //si no existe la asignacion
-        responseFormatter.send404Response(res,"there is no assignment with id: " + req.params.id);
-        return;
-    }
-    //intenta borrar a la asignacion
-    removeAssignmentAndWriteResponse(asg,res);
-   
+    getAssignmentAndProcessResult(req.params.id,res,function(res,asg){
+        removeAssignmentAndWriteResponse(asg,res);
     });
+}
+/**
+ * Obtiene una asignacion y llama a un callback para procesar los resultados
+ *
+ */
+function getAssignmentAndProcessResult(id,res,callback)
+{
+    genericController.getEntityAndProcessResult(assignment,id,["emp_id","proj_id"],res,function(error,id,res){
+        logger.error("error obteniendo la asignacion con ID: " + validId);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(id,res){
+        responseFormatter.send404Response(res,"there is no assignment with id: " + id);
+    },function(proj,res){
+        //si no hay errores se devuelve al proyecto consultado 
+        callback(res,proj);
+     });
 }
 
 /**
@@ -225,18 +192,13 @@ function removeAssignment(req,res)
  */
 function saveAssignmentAndWriteResponse(asg,res)
 {
-    asg.save(function(err, asg) {
-        if(err) 
-        {
-            logger.error("no se pudo guardar al asignacion: " + JSON.stringify(asg));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia la nueva asignacion al usuario
-            responseFormatter.send200Response(res,asg);
-        }
+    genericController.saveEntityAndWriteResponse(asg,res,function(err,proj,res){
+        logger.error("no se pudo guardar al asignacion: " + asg);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(asg,res){
+         //si sale todo ok se le envia la nueva asignacion al usuario
+        responseFormatter.send200Response(res,asg);
     });
 }
 
@@ -250,18 +212,13 @@ function saveAssignmentAndWriteResponse(asg,res)
  */
 function removeAssignmentAndWriteResponse(asg,res)
 {
-     asg.remove(function(err) {
-        if(err) 
-        {
-            logger.error("no se pudo eliminar la asignacion: " + JSON.stringify(asg));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia el nuevo asignacion al usuario
-            responseFormatter.send200Response(res,asg);
-        }
-     });
+    genericController.removeEntityAndWriteResponse(asg,res,function(err,asg,res){
+        logger.error("no se pudo eliminar la asignacion: " + asg);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(asg,res){
+        //si sale todo ok se le envia el proyecto eliminado al usuario
+        responseFormatter.send200Response(res,asg);
+    });
 
 }

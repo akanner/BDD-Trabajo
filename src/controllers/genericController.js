@@ -3,12 +3,31 @@
  *
  */
 
-
+exports.getAllEntities = function(entityModel,populations,httpResponse,errorCallback,successCallback){
+     entityModel.find()
+     .populate(populations.join(" "))
+     .exec(function(err, ent) {
+        //en caso de error se loguea la excepcion y se devueve el error al usuario
+        if(err)
+        {
+            errorCallback(err,httpResponse);
+            return;
+        } 
+        else
+        {
+            //si no hay errores se devuelve la coleccion de entidades al usuario
+            successCallback(httpResponse,ent);
+            return;
+        }
+            
+    });
+}
 /**
  * Intenta recuperar una entidad de la base de datos y procesa la respuesta
  *
  * @param entityModel				modelo de mongoose de la entidad a buscar
  * @param entityId					id de la entidad a buscar
+ * @param 
  * @param httpResponse				respuesta HTTP
  * @param errorCallback				funcion a ejecutar en caso de error
  *	errorCallback(err,entityId,httpResponse)
@@ -24,8 +43,10 @@
  *		@param entityObj	entidad encontrada en la base de datos
  *		@param httpResponse	objeto respuesta http
  */
- exports.getEntityAndProcessResult = function(entityModel,entityId,httpResponse,errorCallback,entityNotFoundCallback,successCallback){
- 	 entityModel.findById(entityId, function(err, entityObj) {
+ exports.getEntityAndProcessResult = function(entityModel,entityId,populations,httpResponse,errorCallback,entityNotFoundCallback,successCallback){
+ 	 entityModel.findById(entityId)
+     .populate(populations)
+     .exec(function(err, entityObj) {
      //si hay un error se loguea la excepcion y se informa al usuario
      if(err)
      {
@@ -61,12 +82,12 @@
         if(err) 
         {
         	//si hay algun error se llama al errorCallback
-           errorCallback(err,entity,httpResponse);
+           errorCallback(err,entityToSave,httpResponse);
         }
         else
         {
         	//si no hay errores se ejecuta successCallback
-            successCallback(entity,httpResponse);
+            successCallback(entityToSave,httpResponse);
         }
     });
  }
