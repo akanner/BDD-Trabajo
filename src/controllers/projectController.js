@@ -44,30 +44,20 @@ exports.findAllProjects = function(req, res) {
 
 //GET - Retorna un proyecto con el id especificado
 exports.findById = function(req, res) {
-	//verfica que el id enviado sea un id valido  
+    //verfica que el id enviado sea un id valido  
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
         return responseFormatter.send412Response(res,"Invalid id");
     }
+    else
+    {
+        //si el id es valido busca en la base de datos un proyecto con ese id
+        return getProjectAndProcessResult(validId,res,function(res,proj){
+            responseFormatter.send200Response(res,proj);
+        })
+    }
 
-    Project.findById(validId, function(err, emp) {
-    //si hay un error se loguea la excepcion y se informa al usuario
-    if(err)
-    {
-    	logger.error("error obteniendo al proyecto con ID: " + validId);
-    	logger.error(err.message);
-    	responseFormatter.send500Response(res,err.message);
-        return;
-    }
-    if(!emp)
-    {
-        responseFormatter.send404Response(res,"there is no project with id: " + req.params.id);
-        return;
-    }
-    //si no hay errores se devuelve al proyecto consultado 
-    responseFormatter.send200Response(res,emp);
-    });
 };
 
 //POST - Inserta un nuevo proyecto en la base de datos
@@ -110,7 +100,7 @@ exports.updateProject = function(req, res) {
         }
         else
         {
-            //si no hay errores se crea el nuevo proyecto
+            //si no hay errores se actualiza el proyecto
             amendProject(req,res);
         }
     });
@@ -164,52 +154,22 @@ function createProject(req,res)
 function amendProject(req,res)
 {
      //busca el project en la base de datos
-     var proj = Project.findById(req.params.id,function(err,proj){
-         if(err)
-         {
-            //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar al proyecto con id " + req.params.id + " : " + err);
-            responseFormatter.send500Response(res,err.message);
-            return;
-         }
-         if(!proj)
-         {
-            responseFormatter.send404Response(res,"there is no project with id: " + req.params.id);
-            return;
-         }
+     getProjectAndProcessResult(req.params.id,res,function(res,proj){
          proj.pname = security.cleanup(req.body.pname);
          proj.budget = security.cleanup(req.body.budget);
 
          //guarda los cambios
         saveProjectAndWriteResponse(proj,res);
 
-
-         
      });
-    
-
 }
 
 function removeProject(req,res)
 {
- Project.findById(req.params.id, function(err, proj) {
-    if(err)
-    {
-         //si hay algun error se le informa al usuario
-        logger.error("no se pudo encontrar al proyecto con id " + req.params.id + " : " + err);
-        responseFormatter.send500Response(res,err.message);
-        return;
-    }
-    if(!proj)
-    {
-        //si no existe el proyecto
-        responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
-        return;
-    }
-    //intenta borrar al empleado
-    removeProjectAndWriteResponse(proj,res);
-   
-    });
+ return getProjectAndProcessResult(req.params.id,res,function(res,proj){
+            //intenta borrar al proyecto
+            removeProjectAndWriteResponse(proj,res);
+        });
 }
 
 /**
@@ -261,4 +221,34 @@ function removeProjectAndWriteResponse(proj,res)
         }
      });
 
+}
+
+/**
+ * Intenta encontrar un projecto buscando por su id, en caso de encontrarlo, se llama a la funcion callbalk pasada por parametro
+ *
+ * @param ID        Id del proyecto
+ * @param res       objeto respuesta HTTP
+ * @param callbalk  funcion callbalk para procesar el proyecto encontrado, dicha funcion recive 2 parametros, callback(res,proj) siendo res el objeto respuesta http y proj el proyecto encontrado en la base de datos
+ *
+ */  
+function getProjectAndProcessResult(id,res,callback)
+{
+
+    Project.findById(id, function(err, proj) {
+    //si hay un error se loguea la excepcion y se informa al usuario
+    if(err)
+    {
+        logger.error("error obteniendo al proyecto con ID: " + id);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+        return;
+    }
+    if(!proj)
+    {
+        responseFormatter.send404Response(res,"there is no project with id: " + id);
+        return;
+    }
+    //si no hay errores se devuelve al proyecto consultado 
+    callback(res,proj)
+    });
 }
