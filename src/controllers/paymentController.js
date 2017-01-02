@@ -28,7 +28,7 @@ mongoose.Promise = global.Promise;
 
 //GET - Retorna todos los payments de la base de datos
 exports.findAllPayments = function(req, res) {
-     genericController.getAllEntities(Payment,res,function(err,res){
+    genericController.getAllEntities(Payment,res,function(err,res){
         logger.error("error obteniendo a los sueldos de la base de datos");
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);
@@ -209,11 +209,11 @@ function savePaymentAndWriteResponse(pay,res)
  */
 function removePaymentAndWriteResponse(pay,res)
 {
-    genericController.removeEntityAndWriteResponse(pay,res,function(err,asg,res){
+    genericController.removeEntityAndWriteResponse(pay,res,function(err,pay,res){
         logger.error("no se pudo eliminar el sueldo: " + pay);
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);
-    },function(asg,res){
+    },function(pay,res){
         //si sale todo ok se le envia el proyecto eliminado al usuario
         responseFormatter.send200Response(res,pay);
     });

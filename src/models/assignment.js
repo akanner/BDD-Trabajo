@@ -23,7 +23,7 @@ var assignmentSchema = new Schema({
   duration: Number
 });
 //agrega un metodo para obtener los campos que se pueden "popular" (de populate)
-assignmentSchema.statics.populations = function(){return ["emp_id","proj_id"]};
+assignmentSchema.statics.populations = function(){return "emp_id proj_id"};
 //se asegura que los ids de emp_id y proj_id existan antes de guardar el modelo
 assignmentSchema.plugin(idvalidator,{message : 'Bad ID value for Project or Employee'});
 //expors schema

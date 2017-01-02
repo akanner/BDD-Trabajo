@@ -44,7 +44,7 @@ exports.getAllEntities = function(entityModel,httpResponse,errorCallback,success
  */
  exports.getEntityAndProcessResult = function(entityModel,entityId,httpResponse,errorCallback,entityNotFoundCallback,successCallback){
  	 entityModel.findById(entityId)
-     .populate(entityModel.populations().join(" "))//el metodo populations() devuelve una coleccion de todos los campos que se pueden "popular"
+     .populate(entityModel.populations())//el metodo populations() devuelve una coleccion de todos los campos que se pueden "popular"
      .exec(function(err, entityObj) {
      //si hay un error se loguea la excepcion y se informa al usuario
      if(err)

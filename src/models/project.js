@@ -13,6 +13,6 @@ var projectSchema = new Schema({
 	}]
 });
 //agrega un metodo para obtener los campos que se pueden "popular" (de populate)
-projectSchema.statics.populations = function(){return ["assignments"]};
+projectSchema.statics.populations = function(){return "assignments"};
 //expors schema
 module.exports = mongoose.model('Project', projectSchema); 

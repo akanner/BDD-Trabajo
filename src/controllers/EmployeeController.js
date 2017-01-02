@@ -11,7 +11,8 @@ var MyLogClass = require('../utils/logger');
 
 //helper de seguridad
 var SecurityHelper = require('../utils/securityHelper');
-
+//controlador generico
+var genericController = require('./genericController');
 //esquema de validaciones de express-validations
 var empValidationsSchema = require("./validations/employeeSchema");
 var util = require('util');
@@ -27,21 +28,14 @@ mongoose.Promise = global.Promise;
 
 //GET - Retorna todos los empleados de la base de datos
 exports.findAllEmployees = function(req, res) {  
-    Employee.find(function(err, emp) {
-    	//en caso de error se loguea la excepcion y se devueve el error al usuario
-	    if(err)
-	    {
-	    	logger.error("error obteniendo a los empleados de la base de datos");
-	    	logger.error(err.message);
-	    	responseFormatter.send500Response(res,err.message);
-	    } 
-	    else
-    	{
-    		//si no hay errores se devuelve la coleccion de empleados al usuario
-    		responseFormatter.send200Response(res,emp);
-    	}
-	        
-    });
+    genericController.getAllEntities(Employee,res,function(err,res){
+        logger.error("error obteniendo a los empleados de la base de datos");
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(res,emp){
+        //si no hay errores se devuelve la coleccion de empleados al usuario
+        responseFormatter.send200Response(res,emp);
+    });  
 };
 
 //GET - Retorna a un empleado con el id especificado
@@ -52,23 +46,9 @@ exports.findById = function(req, res) {
     {
         return responseFormatter.send412Response(res,"Invalid id");
     }
-
-    Employee.findById(validId, function(err, emp) {
-    //si hay un error se loguea la excepcion y se informa al usuario
-    if(err)
-    {
-    	logger.error("error obteniendo al empleado con ID: " + validId);
-    	logger.error(err.message);
-    	responseFormatter.send500Response(res,err.message);
-        return;
-    }
-    if(!emp)
-    {
-        responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
-        return;
-    }
-    //si no hay errores se devuelve al usuario consultado 
-    responseFormatter.send200Response(res,emp);
+    getEmployeeAndProcessResult(validId,res,function(res,emp){
+        //si no hay errores se devuelve al usuario consultado 
+        responseFormatter.send200Response(res,emp);
     });
 };
 
@@ -117,7 +97,7 @@ exports.updateEmployee = function(req, res) {
         else
         {
             //si no hay errores se crea el nuevo empleado
-            updateEmployee(req,res)
+            amendEmployee(req,res)
         }
     });
 };
@@ -135,23 +115,8 @@ exports.deleteEmployee = function(req, res) {
     {
         return responseFormatter.send412Response(res,"Invalid id");
     }
-    Employee.findById(req.params.id, function(err, emp) {
-        if(err)
-        {
-             //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
-            responseFormatter.send500Response(res,err.message);
-            return;
-        }
-        if(!emp)
-        {
-            //si no existe el empleado
-            responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
-            return;
-        }
-        //intenta borrar al empleado
+    getEmployeeAndProcessResult(validId,res,function(res,emp){
         removeEmployeeAndWriteResponse(emp,res);
-       
     });
 };
 
@@ -169,8 +134,8 @@ function createEmployee(req,res)
 {
     //si el requerimiento es valido crea el nuevo empleado
     var emp = new Employee({
-        title:    req.body.title,
-        ename:     req.body.ename,
+        title:    security.cleanup(req.body.title),
+        ename:    security.cleanup(req.body.ename)
     });
     //trata de guardar al empleado recien creado
     saveEmployeeAndWriteResponse(emp,res);
@@ -183,33 +148,32 @@ function createEmployee(req,res)
  * @param res   Objeto HTTP Response
  *
  */
-function updateEmployee(req,res)
+function amendEmployee(req,res)
 {
-     //busca el empleado en la base de datos
-     var emp = Employee.findById(req.params.id,function(err,emp){
-         if(err)
-         {
-            //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar al empleado con id " + req.params.id + " : " + err);
-            responseFormatter.send500Response(res,err.message);
-            return;
-         }
-         if(!emp)
-         {
-            responseFormatter.send404Response(res,"there is no employee with id: " + req.params.id);
-            return;
-         }
-         emp.title = security.cleanup(req.body.title);
-         emp.ename = security.cleanup(req.body.ename);
-
-         //guarda los cambios
+    getEmployeeAndProcessResult(req.params.id,res,function(res,emp){
+        emp.title = security.cleanup(req.body.title);
+        emp.ename = security.cleanup(req.body.ename);
+        //guarda los cambios
         saveEmployeeAndWriteResponse(emp,res);
+    });
+}
 
-
-         
-     });
-    
-
+/**
+ * Obtiene un sueldo y llama a un callback para procesar los resultados
+ *
+ */
+function getEmployeeAndProcessResult(id,res,callback)
+{
+    genericController.getEntityAndProcessResult(Employee,id,res,function(error,id,res){
+        logger.error("error obteniendo al empleado con ID: " + id);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(id,res){
+         responseFormatter.send404Response(res,"there is no employee with id: " + id);
+    },function(emp,res){
+        //si no hay errores se devuelve al proyecto consultado 
+        callback(res,emp);
+    });
 }
 /**
  * Guarda el usuario en la base de datos y escribe en la respuesta
@@ -221,18 +185,14 @@ function updateEmployee(req,res)
  */
 function saveEmployeeAndWriteResponse(emp,res)
 {
-    emp.save(function(err, emp) {
-        if(err) 
-        {
-            logger.error("no se pudo guardar el empleado: " + JSON.stringify(emp));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia el nuevo empleado al usuario
-            responseFormatter.send200Response(res,emp);
-        }
+    console.log(emp);
+    genericController.saveEntityAndWriteResponse(emp,res,function(err,emp,res){
+        logger.error("no se pudo guardar el empleado: " + emp);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(emp,res){
+        //si sale todo ok se le envia el nuevo empleado al usuario
+        responseFormatter.send200Response(res,emp);
     });
 }
 /**
@@ -245,18 +205,12 @@ function saveEmployeeAndWriteResponse(emp,res)
  */
 function removeEmployeeAndWriteResponse(emp,res)
 {
-     emp.remove(function(err) {
-        if(err) 
-        {
-            logger.error("no se pudo eliminar el empleado: " + JSON.stringify(emp));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia el nuevo empleado al usuario
-            responseFormatter.send200Response(res,emp);
-        }
-     });
-
+    genericController.removeEntityAndWriteResponse(emp,res,function(err,emp,res){
+        logger.error("no se pudo eliminar el empleado: " + emp);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(emp,res){
+        //si sale todo ok se le envia el nuevo empleado al usuario
+        responseFormatter.send200Response(res,emp);
+    });
 }
