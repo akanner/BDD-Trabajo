@@ -3,9 +3,8 @@
  *
  */
 
-exports.getAllEntities = function(entityModel,populations,httpResponse,errorCallback,successCallback){
+exports.getAllEntities = function(entityModel,httpResponse,errorCallback,successCallback){
      entityModel.find()
-     .populate(populations.join(" "))
      .exec(function(err, ent) {
         //en caso de error se loguea la excepcion y se devueve el error al usuario
         if(err)
@@ -43,9 +42,9 @@ exports.getAllEntities = function(entityModel,populations,httpResponse,errorCall
  *		@param entityObj	entidad encontrada en la base de datos
  *		@param httpResponse	objeto respuesta http
  */
- exports.getEntityAndProcessResult = function(entityModel,entityId,populations,httpResponse,errorCallback,entityNotFoundCallback,successCallback){
+ exports.getEntityAndProcessResult = function(entityModel,entityId,httpResponse,errorCallback,entityNotFoundCallback,successCallback){
  	 entityModel.findById(entityId)
-     .populate(populations)
+     .populate(entityModel.populations().join(" "))//el metodo populations() devuelve una coleccion de todos los campos que se pueden "popular"
      .exec(function(err, entityObj) {
      //si hay un error se loguea la excepcion y se informa al usuario
      if(err)

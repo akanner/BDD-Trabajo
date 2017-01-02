@@ -29,7 +29,7 @@ var INVALID_ID = "Invalid id";
 
 //GET - Retorna todos los proyectos de la base de datos
 exports.findAllProjects = function(req, res) {  
-    genericController.getAllEntities(Project,["assignments"],res,function(err,res){
+    genericController.getAllEntities(Project,res,function(err,res){
         logger.error("error obteniendo los proyectos de la base de datos");
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);
@@ -224,7 +224,7 @@ function removeProjectAndWriteResponse(proj,res)
  */  
 function getProjectAndProcessResult(id,res,callback)
 {
-    genericController.getEntityAndProcessResult(Project,id,null,res,errorFindingAProjectWithId,projectNotFound,function(proj,res){
+    genericController.getEntityAndProcessResult(Project,id,res,errorFindingAProjectWithId,projectNotFound,function(proj,res){
         //si no hay errores se devuelve al proyecto consultado 
         callback(res,proj);
      });

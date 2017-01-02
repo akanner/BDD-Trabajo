@@ -11,7 +11,8 @@ var MyLogClass = require('../utils/logger');
 
 //helper de seguridad
 var SecurityHelper = require('../utils/securityHelper');
-
+//controlador generico
+var genericController = require('./genericController');
 //esquema de validaciones de express-validations
 var payValidationsSchema = require("./validations/paymentSchema");
 var util = require('util');
@@ -26,22 +27,15 @@ mongoose.Promise = global.Promise;
 //VERBOS
 
 //GET - Retorna todos los payments de la base de datos
-exports.findAllPayments = function(req, res) {  
-    Payment.find(function(err, pay) {
-    	//en caso de error se loguea la excepcion y se devueve el error al usuario
-	    if(err)
-	    {
-	    	logger.error("error obteniendo a los sueldos de la base de datos");
-	    	logger.error(err.message);
-	    	responseFormatter.send500Response(res,err.message);
-	    } 
-	    else
-    	{
-    		//si no hay errores se devuelve la coleccion de pagos al usuario
-    		responseFormatter.send200Response(res,pay);
-    	}
-	        
-    });
+exports.findAllPayments = function(req, res) {
+     genericController.getAllEntities(Payment,res,function(err,res){
+        logger.error("error obteniendo a los sueldos de la base de datos");
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+        },function(res,pay){
+            //si no hay errores se devuelve la coleccion de proyectos al usuario
+            responseFormatter.send200Response(res,pay);
+        });  
 };
 
 //GET - Retorna a un sueldo con el id especificado
@@ -53,22 +47,9 @@ exports.findById = function(req, res) {
         return responseFormatter.send412Response(res,"Invalid id");
     }
 
-    Payment.findById(validId, function(err, pay) {
-    //si hay un error se loguea la excepcion y se informa al usuario
-    if(err)
-    {
-    	logger.error("error obteniendo al sueldo con ID: " + validId);
-    	logger.error(err.message);
-    	responseFormatter.send500Response(res,err.message);
-        return;
-    }
-    if(!pay)
-    {
-        responseFormatter.send404Response(res,"there is no payment with id: " + req.params.id);
-        return;
-    }
-    //si no hay errores se devuelve al sueldo consultado 
-    responseFormatter.send200Response(res,pay);
+    getPaymentAndProcessResult(validId,res,function(res,pay){
+        //si no hay errores se devuelve al sueldo consultado 
+        responseFormatter.send200Response(res,pay);
     });
 };
 
@@ -135,23 +116,9 @@ exports.deletePayment = function(req, res) {
     {
         return responseFormatter.send412Response(res,"Invalid id");
     }
-    Payment.findById(req.params.id, function(err, pay) {
-        if(err)
-        {
-             //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar al sueldo con id " + req.params.id + " : " + err);
-            responseFormatter.send500Response(res,err.message);
-            return;
-        }
-        if(!pay)
-        {
-            //si no existe el payment
-            responseFormatter.send404Response(res,"there is no payment with id: " + req.params.id);
-            return;
-        }
+    getPaymentAndProcessResult(validId,res,function(res,pay){
         //intenta borrar al payment
         removePaymentAndWriteResponse(pay,res);
-       
     });
 };
 
@@ -186,31 +153,33 @@ function createPayment(req,res)
 function updatePayment(req,res)
 {
      //busca el sueldo en la base de datos
-     var pay = Payment.findById(req.params.id,function(err,pay){
-         if(err)
-         {
-            //si hay algun error se le informa al usuario
-            logger.error("no se pudo encontrar al sueldo con id " + req.params.id + " : " + err);
-            responseFormatter.send500Response(res,err.message);
-            return;
-         }
-         if(!pay)
-         {
-            responseFormatter.send404Response(res,"there is no payment with id: " + req.params.id);
-            return;
-         }
-         pay.title = security.cleanup(req.body.title);
-         pay.salary = security.cleanup(req.body.salary);
+     getPaymentAndProcessResult(req.params.id,res,function(res,pay){
+        pay.title = security.cleanup(req.body.title);
+        pay.salary = security.cleanup(req.body.salary);
 
-         //guarda los cambios
+        //guarda los cambios
         savePaymentAndWriteResponse(pay,res);
-
-
-         
      });
-    
-
 }
+
+/**
+ * Obtiene un sueldo y llama a un callback para procesar los resultados
+ *
+ */
+function getPaymentAndProcessResult(id,res,callback)
+{
+    genericController.getEntityAndProcessResult(Payment,id,res,function(error,id,res){
+        logger.error("error obteniendo al sueldo con ID: " + id);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(id,res){
+         responseFormatter.send404Response(res,"there is no payment with id: " + id);
+    },function(pay,res){
+        //si no hay errores se devuelve al proyecto consultado 
+        callback(res,pay);
+     });
+}
+
 /**
  * Guarda el sueldo en la base de datos y escribe en la respuesta
  *
@@ -221,18 +190,13 @@ function updatePayment(req,res)
  */
 function savePaymentAndWriteResponse(pay,res)
 {
-    pay.save(function(err, pay) {
-        if(err) 
-        {
-            logger.error("no se pudo guardar el sueldo: " + JSON.stringify(pay));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia el nuevo sueldo al usuario
-            responseFormatter.send200Response(res,pay);
-        }
+    genericController.saveEntityAndWriteResponse(pay,res,function(err,pay,res){
+       logger.error("no se pudo guardar el sueldo: " + pay);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(asg,res){
+        //si sale todo ok se le envia el nuevo sueldo al usuario
+        responseFormatter.send200Response(res,pay);
     });
 }
 /**
@@ -245,18 +209,12 @@ function savePaymentAndWriteResponse(pay,res)
  */
 function removePaymentAndWriteResponse(pay,res)
 {
-     pay.remove(function(err) {
-        if(err) 
-        {
-            logger.error("no se pudo eliminar el sueldo: " + JSON.stringify(pay));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia el nuevo sueldo al usuario
-            responseFormatter.send200Response(res,pay);
-        }
-     });
-
+    genericController.removeEntityAndWriteResponse(pay,res,function(err,asg,res){
+        logger.error("no se pudo eliminar el sueldo: " + pay);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(asg,res){
+        //si sale todo ok se le envia el proyecto eliminado al usuario
+        responseFormatter.send200Response(res,pay);
+    });
 }
