@@ -8,7 +8,8 @@ var Project  = require('../models/project');
 var mongoose = require('mongoose');
 //Logger
 var MyLogClass = require('../utils/logger');
-
+//controlador generico
+var genericController = require('./genericController');
 //helper de seguridad
 var SecurityHelper = require('../utils/securityHelper');
 
@@ -22,6 +23,9 @@ var security = new SecurityHelper();
 var responseFormatter = require('../utils/responseFormatter');
 //usamos las promesas incluidas en ES6, las promesas de mongoDB estan deprecadas!!
 mongoose.Promise = global.Promise;
+
+//Constantes
+var INVALID_ID = "Invalid id";
 
 //GET - Retorna todos los proyectos de la base de datos
 exports.findAllProjects = function(req, res) {  
@@ -48,7 +52,7 @@ exports.findById = function(req, res) {
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
-        return responseFormatter.send412Response(res,"Invalid id");
+        return responseFormatter.send412Response(res,INVALID_ID);
     }
     else
     {
@@ -89,7 +93,7 @@ exports.updateProject = function(req, res) {
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
-        return responseFormatter.send412Response(res,"Invalid id");
+        return responseFormatter.send412Response(res,INVALID_ID);
     }
      //getValidationResult devuelve una promesa
     req.getValidationResult().then(function(result) {
@@ -114,7 +118,7 @@ exports.deleteProject = function(req, res) {
     var validId = security.getValidId(req.params.id);
     if (validId == false) 
     {
-        return responseFormatter.send412Response(res,"Invalid id");
+        return responseFormatter.send412Response(res,INVALID_ID);
     }
     else
     {
@@ -163,7 +167,12 @@ function amendProject(req,res)
 
      });
 }
-
+/**
+ * elimina un proyecto de la base de datos
+ *
+ * @param req   Objeto HTTP Request
+ * @param res   Objeto HTTP Response
+ */
 function removeProject(req,res)
 {
  return getProjectAndProcessResult(req.params.id,res,function(res,proj){
@@ -182,19 +191,14 @@ function removeProject(req,res)
  */
 function saveProjectAndWriteResponse(proj,res)
 {
-    proj.save(function(err, proj) {
-        if(err) 
-        {
-            logger.error("no se pudo guardar al proyecto: " + JSON.stringify(proj));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia el nuevo empleado al usuario
-            responseFormatter.send200Response(res,proj);
-        }
-    });
+   genericController.saveEntityAndWriteResponse(proj,res,function(err,proj,res){
+    logger.error("no se pudo guardar el proyecto: " + proj);
+    logger.error(err.message);
+    responseFormatter.send500Response(res,err.message);
+   },function(proj,res){
+     //si sale todo ok se le envia el nuevo proyecto al usuario
+    responseFormatter.send200Response(res,proj);
+   });
 }
 
 /**
@@ -207,20 +211,14 @@ function saveProjectAndWriteResponse(proj,res)
  */
 function removeProjectAndWriteResponse(proj,res)
 {
-     proj.remove(function(err) {
-        if(err) 
-        {
-            logger.error("no se pudo eliminar el proyecto: " + JSON.stringify(proj));
-            logger.error(err.message);
-            responseFormatter.send500Response(res,err.message);
-        }
-        else
-        {
-            //si sale todo ok se le envia el nuevo proyecto al usuario
-            responseFormatter.send200Response(res,proj);
-        }
-     });
-
+    genericController.removeEntityAndWriteResponse(proj,res,function(err,proj,res){
+        logger.error("no se pudo eliminar el proyecto: " + proj);
+        logger.error(err.message);
+        responseFormatter.send500Response(res,err.message);
+    },function(proj,res){
+        //si sale todo ok se le envia el proyecto eliminado al usuario
+        responseFormatter.send200Response(res,proj);
+    });
 }
 
 /**
@@ -233,22 +231,26 @@ function removeProjectAndWriteResponse(proj,res)
  */  
 function getProjectAndProcessResult(id,res,callback)
 {
-
-    Project.findById(id, function(err, proj) {
-    //si hay un error se loguea la excepcion y se informa al usuario
-    if(err)
-    {
-        logger.error("error obteniendo al proyecto con ID: " + id);
-        logger.error(err.message);
-        responseFormatter.send500Response(res,err.message);
-        return;
-    }
-    if(!proj)
-    {
-        responseFormatter.send404Response(res,"there is no project with id: " + id);
-        return;
-    }
-    //si no hay errores se devuelve al proyecto consultado 
-    callback(res,proj)
-    });
+    genericController.getEntityAndProcessResult(Project,id,res,errorFindingAProjectWithId,projectNotFound,function(proj,res){
+        //si no hay errores se devuelve al proyecto consultado 
+        callback(res,proj);
+     });
+}
+/**
+ * funcion utilizada como errorCallback del metodo getEntityAndProcessResult de genericController
+ *
+ */ 
+function errorFindingAProjectWithId(error,id,res)
+{
+    logger.error("error obteniendo al proyecto con ID: " + id);
+    logger.error(err.message);
+    responseFormatter.send500Response(res,err.message);
+}
+/**
+ * funcion utilizada como entityNotFoundCallback del metodo getEntityAndProcessResult de genericController
+ *
+ */
+function projectNotFound(id,res)
+{
+    responseFormatter.send404Response(res,"there is no project with id: " + id);
 }
