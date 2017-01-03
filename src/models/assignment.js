@@ -2,8 +2,9 @@
  * Modelo de las asignaciones de los proyectos
  *
  */
-var idvalidator = require('mongoose-id-validator');
-var mongoose = require('mongoose'),  
+var idvalidator = require('mongoose-id-validator'),
+    mongoose = require('mongoose'),
+    relationship = require("mongoose-relationship"),  
     Schema   = mongoose.Schema;
 
 //sets schema
@@ -17,11 +18,14 @@ var assignmentSchema = new Schema({
   proj_id: {
   	type: mongoose.Schema.Types.ObjectId,
   	ref: 'Project',
-    required: true
+    required: true,
+    childPath:"assignments"
   },
   responsibilities: String,
   duration: Number
 });
+//maneja las actualizaciones de las relaciones
+assignmentSchema.plugin(relationship, { relationshipPathName:'proj_id' });
 //agrega un metodo para obtener los campos que se pueden "popular" (de populate)
 assignmentSchema.statics.populations = function(){return "emp_id proj_id"};
 //se asegura que los ids de emp_id y proj_id existan antes de guardar el modelo
