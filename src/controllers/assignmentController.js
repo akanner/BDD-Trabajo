@@ -27,7 +27,7 @@ mongoose.Promise = global.Promise;
 //GET - Retorna las asignaciones de un determinado proyecto
 exports.findAllAssignments = function(req, res) {
     //obtiene los parametros para filtrar la query
-    var filters = genericController.filterQueryParameters(req.query,["responsibilities","duration","emp_id","proj_id"]);
+    var filters = genericController.filterQueryParameters(req.query,["responsibilities","duration","employee","project"]);
     genericController.getAllEntities(assignment,filters,res,function(err,res){
         logger.error("error obteniendo los asignaciones de la base de datos");
         logger.error(err.message);
@@ -131,8 +131,8 @@ function createAssignment(req,res)
 {
     //si el requerimiento es valido crea la nueva asignacion
     var asg = new assignment({
-        emp_id:    security.cleanup(req.body.emp_id),
-        proj_id:   security.cleanup(req.body.proj_id),
+        employee:    security.cleanup(req.body.employee),
+        project:   security.cleanup(req.body.project),
         responsibilities: security.cleanup(req.body.responsibilities),
         duration : security.cleanup(req.body.duration)
     });
@@ -151,8 +151,8 @@ function createAssignment(req,res)
 function amendAssignment(req,res)
 {
     getAssignmentAndProcessResult(req.params.id,res,function(res,asg){
-         asg.emp_id = security.cleanup(req.body.emp_id);
-         asg.proj_id = security.cleanup(req.body.proj_id);
+         asg.employee = security.cleanup(req.body.employee);
+         asg.project = security.cleanup(req.body.project);
          asg.responsibilities = security.cleanup(req.body.responsibilities),
          asg.duration = security.cleanup(req.body.duration)
          //guarda los cambios
