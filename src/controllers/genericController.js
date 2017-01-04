@@ -3,8 +3,20 @@
  *
  */
 
-exports.getAllEntities = function(entityModel,httpResponse,errorCallback,successCallback){
-     entityModel.find()
+ //helper de seguridad
+var SecurityHelper = require('../utils/securityHelper');
+var security = new SecurityHelper();
+/**
+ * Busca todas las entidades que coincidan con los filtros enviados
+ *
+ * @param {object} entityModel      Modelo de Mongoose
+ * @param {object} filters          Filtros de la consulta, si se envia {} no se filtra, solo se filtraran campos que existan en entityModel
+ * @param {object} httpResponse     Objecto respuesta http
+ * @param function errorCallbalk    Calkback en caso de algun error
+ * @param function successCallback  callback a ejecutar luego de realizar la consulta
+ */
+exports.getAllEntities = function(entityModel,filters,httpResponse,errorCallback,successCallback){
+     entityModel.find(filters)
      .exec(function(err, ent) {
         //en caso de error se loguea la excepcion y se devueve el error al usuario
         if(err)
@@ -118,4 +130,25 @@ exports.getAllEntities = function(entityModel,httpResponse,errorCallback,success
             successCallback(entityToDelete,httpResponse);
         }
      });
+ }
+
+ /**
+  * filtra los parametros enviados como query parameters en el requerimiento http de acuerdo a los nombres pasados por parametro
+  * 
+  * @param {object} queryParameters     parametros enviados como query parameters dentro del requerimiento http
+  * @param [string] parametersNames     lista con los nombres de los parametros que se deben obtener
+  *
+  * @return {object} parametros filtrados
+  *
+  */
+ exports.filterQueryParameters =function(queryParameters,parametersNames){
+    var filteredParameters = {};
+    parametersNames.forEach(function(paramName){
+        var paramValue = queryParameters[paramName];
+        //si el parametro existe se sanitiza, y se filtra
+        if(paramValue){
+            filteredParameters[paramName] = security.cleanup(paramValue);
+        }
+    });
+    return filteredParameters;
  }

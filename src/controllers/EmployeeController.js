@@ -27,8 +27,10 @@ mongoose.Promise = global.Promise;
 //VERBOS
 
 //GET - Retorna todos los empleados de la base de datos
-exports.findAllEmployees = function(req, res) {  
-    genericController.getAllEntities(Employee,res,function(err,res){
+exports.findAllEmployees = function(req, res) {
+    //filtra los resultados
+    var filters = genericController.filterQueryParameters(req.query,["ename","title"]);
+    genericController.getAllEntities(Employee,filters,res,function(err,res){
         logger.error("error obteniendo a los empleados de la base de datos");
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);

@@ -28,8 +28,10 @@ mongoose.Promise = global.Promise;
 var INVALID_ID = "Invalid id";
 
 //GET - Retorna todos los proyectos de la base de datos
-exports.findAllProjects = function(req, res) {  
-    genericController.getAllEntities(Project,res,function(err,res){
+exports.findAllProjects = function(req, res) {
+    //obtiene los parametros para filtrar la query
+    var filters = genericController.filterQueryParameters(req.query,["pname","budget"]);  
+    genericController.getAllEntities(Project,filters,res,function(err,res){
         logger.error("error obteniendo los proyectos de la base de datos");
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);
