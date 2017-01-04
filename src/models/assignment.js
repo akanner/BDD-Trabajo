@@ -10,12 +10,12 @@ var idvalidator = require('mongoose-id-validator'),
 //sets schema
 
 var assignmentSchema = new Schema({	  
-  emp_id : {
+  employee : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Employee',
         required: true
   },
-  proj_id: {
+  project: {
   	type: mongoose.Schema.Types.ObjectId,
   	ref: 'Project',
     required: true,
@@ -25,10 +25,10 @@ var assignmentSchema = new Schema({
   duration: Number
 });
 //maneja las actualizaciones de las relaciones
-assignmentSchema.plugin(relationship, { relationshipPathName:'proj_id' });
+assignmentSchema.plugin(relationship, { relationshipPathName:'project' });
 //agrega un metodo para obtener los campos que se pueden "popular" (de populate)
-assignmentSchema.statics.populations = function(){return "emp_id proj_id"};
-//se asegura que los ids de emp_id y proj_id existan antes de guardar el modelo
+assignmentSchema.statics.populations = function(){return "employee project"};
+//se asegura que los ids de employee y project existan antes de guardar el modelo
 assignmentSchema.plugin(idvalidator,{message : 'Bad ID value for Project or Employee'});
 //expors schema
 module.exports = mongoose.model('Assignment', assignmentSchema); 

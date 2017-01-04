@@ -3,15 +3,15 @@
  */
 
  var assignmentSchema = {
- 'emp_id': {
+ 'employee': {
     in: 'body',
     notEmpty: true,
-    errorMessage: "emp_id is required"
+    errorMessage: "employee is required"
   },
-  'proj_id': {
+  'project': {
   	in: 'body',
     notEmpty: true,
-    errorMessage: 'proj_id is required' // Error message for the parameter
+    errorMessage: 'project is required' // Error message for the parameter
   },
     'responsibilities': {
   	in: 'body',
