@@ -6,8 +6,10 @@ var idvalidator = require('mongoose-id-validator');
 
 var employeeSchema = new Schema({	  
   ename: String,
-  title: {type: mongoose.Schema.Types.ObjectId,
-    ref: 'Payment'}
+  title: {
+  	tname: String,
+  	salary: Number
+  }
 });
 
 
@@ -15,6 +17,6 @@ var employeeSchema = new Schema({
 employeeSchema.plugin(idvalidator,{message : 'Bad ID value for title'});
 
 //agrega un metodo para obtener los campos que se pueden "popular" (de populate)
-employeeSchema.statics.populations = function(){return "title"};
+employeeSchema.statics.populations = function(){return ""};
 //expors schema
 module.exports = mongoose.model('Employee', employeeSchema); 

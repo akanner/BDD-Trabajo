@@ -29,7 +29,7 @@ mongoose.Promise = global.Promise;
 //GET - Retorna todos los empleados de la base de datos
 exports.findAllEmployees = function(req, res) {
     //filtra los resultados
-    var filters = genericController.filterQueryParameters(req.query,["ename","title"]);
+    var filters = genericController.filterQueryParameters(req.query,["ename","title.tname","title.salary"]);
     genericController.getAllEntities(Employee,filters,res,function(err,res){
         logger.error("error obteniendo a los empleados de la base de datos");
         logger.error(err.message);
@@ -136,7 +136,7 @@ function createEmployee(req,res)
 {
     //si el requerimiento es valido crea el nuevo empleado
     var emp = new Employee({
-        title:    security.cleanup(req.body.title),
+        title:    {tname: security.cleanup(req.body.title.tname), salary: security.cleanup(req.body.title.salary)},
         ename:    security.cleanup(req.body.ename)
     });
     //trata de guardar al empleado recien creado
@@ -153,7 +153,7 @@ function createEmployee(req,res)
 function amendEmployee(req,res)
 {
     getEmployeeAndProcessResult(req.params.id,res,function(res,emp){
-        emp.title = security.cleanup(req.body.title);
+        emp.title = {tname: security.cleanup(req.body.title.tname), salary: security.cleanup(req.body.title.salary)}
         emp.ename = security.cleanup(req.body.ename);
         //guarda los cambios
         saveEmployeeAndWriteResponse(emp,res);
