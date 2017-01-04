@@ -26,7 +26,9 @@ mongoose.Promise = global.Promise;
 
 //GET - Retorna las asignaciones de un determinado proyecto
 exports.findAllAssignments = function(req, res) {
-    genericController.getAllEntities(assignment,res,function(err,res){
+    //obtiene los parametros para filtrar la query
+    var filters = genericController.filterQueryParameters(req.query,["responsibilities","duration","emp_id","proj_id"]);
+    genericController.getAllEntities(assignment,filters,res,function(err,res){
         logger.error("error obteniendo los asignaciones de la base de datos");
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);

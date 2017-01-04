@@ -28,7 +28,9 @@ mongoose.Promise = global.Promise;
 
 //GET - Retorna todos los payments de la base de datos
 exports.findAllPayments = function(req, res) {
-    genericController.getAllEntities(Payment,res,function(err,res){
+    //obtiene los parametros para filtrar la query
+    var filters = genericController.filterQueryParameters(req.query,["title","salary"]);
+    genericController.getAllEntities(Payment,filters,res,function(err,res){
         logger.error("error obteniendo a los sueldos de la base de datos");
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);

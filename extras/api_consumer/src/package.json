@@ -1,0 +1,7 @@
+{
+  "name": "BBDD2016_api_client",
+  "main": "client.js",
+  "dependencies": {
+    "request": "^2.74.0"
+  }
+}
