@@ -2,6 +2,10 @@
   "name": "BBDD2016_api_client",
   "main": "client.js",
   "dependencies": {
-    "request": "^2.74.0"
+    "forallasync": "^1.0.2",
+    "randomstring": "^1.1.5",
+    "request": "^2.74.0",
+    "request-promise": "^4.1.1",
+    "sequence": "^3.0.0"
   }
 }
