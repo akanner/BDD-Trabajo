@@ -187,7 +187,6 @@ function getEmployeeAndProcessResult(id,res,callback)
  */
 function saveEmployeeAndWriteResponse(emp,res)
 {
-    console.log(emp);
     genericController.saveEntityAndWriteResponse(emp,res,function(err,emp,res){
         logger.error("no se pudo guardar el empleado: " + emp);
         logger.error(err.message);

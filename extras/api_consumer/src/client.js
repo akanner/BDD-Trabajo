@@ -42,6 +42,7 @@ function getRandomElementInArray(array){
 
 //#############################################################################################
 //FUNCIONES QUE CREAN LOS REQUERIMIENTOS PARA LA API
+//TODO: pasar las urls al archivo de config
 function createPaymentHttpRequest(){
 	var randomSalary = getRandomInt(10000,100000);
  	var randomTitle  = randomstring.generate(8);
