@@ -189,7 +189,7 @@ forAllAsync(paymentsHttpRequests, makePaymentRequest, 100)
 						console.log("creando assignments...");
 						var asgHttpRequests = createAssignmentsHttpRequests();
 						//envia los requerimientos para crear las asignaciones (100 a la vez)
-						forAllAsync(asgHttpRequests,makeAssignmentRequest,100)
+						forAllAsync(asgHttpRequests,makeAssignmentRequest,10)
 							.then(function(){
 								console.log("listo!");
 							})
