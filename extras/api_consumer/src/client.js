@@ -179,7 +179,7 @@ forAllAsync(paymentsHttpRequests, makePaymentRequest, 100)
 		console.log("creando employees...");
 		var employeesHttpRequests = createEmployeesHttpRequests();
 		//envia los requerimientos para crear los empleados (100 a la vez)
-		forAllAsync(employeesHttpRequests,makeEmployeeRequest,1000)
+		forAllAsync(employeesHttpRequests,makeEmployeeRequest,100)
 			.then(function(){
 				console.log("creando projects...");
 				var projectsHttpRequests = createProjectsHttpRequests();
