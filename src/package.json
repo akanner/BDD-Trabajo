@@ -12,7 +12,7 @@
     "express": "^4.14.0",
     "log4js": "^0.6.38",
     "mongo-sanitize": "^1.0.0",
-    "mongoose": "^4.5.7",
+    "mongoose": "4.5.9",
     "request": "^2.74.0",
     "express-validator": "^3.1.0",
     "morgan" : "^1.7.0",

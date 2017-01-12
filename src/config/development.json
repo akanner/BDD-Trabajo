@@ -1,9 +1,13 @@
 {
   "Mongo": {
-    "host": "localhost",
+    "hosts": [
+    	"localhost:30001",
+    	"localhost:30002",
+    	"localhost:30003"
+    ],
     "client": "mongodb",
-    "port": 27017,
-    "dbName": "api_dev"
+    "dbName": "rtest",
+    "replicaSet" : "mongo-replicas-network"
   },
   "Log4js": {
     "confPath": "log4js_config.json"

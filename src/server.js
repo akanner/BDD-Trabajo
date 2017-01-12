@@ -1,6 +1,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var config = require('./config');
+var mongooseUrlHelper = require('./utils/mongoConnectionStringHelper');
 var bodyParser = require('body-parser');
 //Logger
 var myLogClass = require('./utils/logger');
@@ -21,7 +21,7 @@ app.use(expressValidator()); // this line must be immediately after any of the b
 app.use(morgan('combined')); //log de request
 
 //crea el string de conexion de mongoDBs
-var urlMongoose = config.Mongo.client + "://" + config.Mongo.host + ":" + config.Mongo.port + "/" + config.Mongo.dbName;
+var urlMongoose = mongooseUrlHelper.getMongoConnectionString();
 //trata de conectarse a la base de datos, si hay un error, logger loguea la excepcion y la aplicacion devuelve el error
 mongoose.connect(urlMongoose, function (err) {
     if (err) 
