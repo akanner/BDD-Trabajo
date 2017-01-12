@@ -92,6 +92,13 @@ exports.getAllEntities = function(entityModel,filters,httpResponse,errorCallback
  	    entityToSave.save(function(err, entity) {
         if(err) 
         {
+            if(err.name == "ValidationError"){
+                //en este caso obtengo el mensaje de adentro del objeto err
+                //caso contrario mantengo el error por defecto
+                //estos errores son los errores producidos al intentar guardar un objeto con alguna propiedad referenciando a un objeto inexistente
+                err.message = extractErrorMessageFromValidationError(err);
+            }
+            
         	//si hay algun error se llama al errorCallback
            errorCallback(err,entityToSave,httpResponse);
         }
@@ -151,4 +158,49 @@ exports.getAllEntities = function(entityModel,filters,httpResponse,errorCallback
         }
     });
     return filteredParameters;
+ }
+/**
+ * la funcion devuelve el motivo del error en el caso de intentar 
+ * guardar una entidad que referencia a ids que no existen en la base de datos
+ *
+ * @param {object} err Objeto que representa un error de validacion del paquete mongoose-id-validator
+ *
+ * @return string Causas del error
+ *
+ */
+ function extractErrorMessageFromValidationError(err){
+    var errorMessages=[];
+    /*obtiene los errores del objeto err, dicho objeto es semejante al siguiente ejemplo
+    { [ValidationError: Assignment validation failed]
+      message: 'Assignment validation failed',
+      name: 'ValidationError',
+      errors: 
+       { project: 
+          { [ValidatorError: Bad ID value for Project or Employee]
+            message: 'Bad ID value for Project or Employee',
+            name: 'ValidatorError',
+            properties: [Object],
+            kind: 'user defined',
+            path: 'project',
+            value: 5873cfe33d11c51c14d58c63 },
+         employee: 
+          { [ValidatorError: Bad ID value for Project or Employee]
+            message: 'Bad ID value for Project or Employee',
+            name: 'ValidatorError',
+            properties: [Object],
+            kind: 'user defined',
+            path: 'employee',
+            value: 5873cf713d11c51c14d402dc } } }
+*/
+    var errors = err.errors;
+    console.log(errors.project);
+    var errorsProperties = Object.keys(errors);
+    
+    //iteramos sobre las propiedades del objeto, en el ejemplo son project y employee
+    errorsProperties.forEach(function(elem){
+        errorMessages.push(errors[elem].message);
+    })
+       
+    //devuelve los errores de la valuelidacion separados por coma
+    return errorMessages.join();
  }
