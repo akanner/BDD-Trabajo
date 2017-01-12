@@ -29,6 +29,6 @@ assignmentSchema.plugin(relationship, { relationshipPathName:'project' });
 //agrega un metodo para obtener los campos que se pueden "popular" (de populate)
 assignmentSchema.statics.populations = function(){return "employee project"};
 //se asegura que los ids de employee y project existan antes de guardar el modelo
-assignmentSchema.plugin(idvalidator,{message : 'Bad ID value for Project or Employee'});
+assignmentSchema.plugin(idvalidator);
 //expors schema
 module.exports = mongoose.model('Assignment', assignmentSchema); 
