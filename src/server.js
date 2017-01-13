@@ -22,8 +22,9 @@ app.use(morgan('combined')); //log de request
 
 //crea el string de conexion de mongoDBs
 var urlMongoose = mongooseUrlHelper.getMongoConnectionString();
+var dbOptions = mongooseUrlHelper.getMongoConnectionOptions();
 //trata de conectarse a la base de datos, si hay un error, logger loguea la excepcion y la aplicacion devuelve el error
-mongoose.connect(urlMongoose, function (err) {
+mongoose.connect(urlMongoose,dbOptions, function (err) {
     if (err) 
     	{
     		logger.fatal("Cannot stablish connection with DB, Exception: " + err.message);

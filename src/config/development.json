@@ -6,7 +6,7 @@
     	"localhost:30003"
     ],
     "client": "mongodb",
-    "dbName": "rtest",
+    "dbName": "api_db",
     "replicaSet" : "mongo-replicas-network"
   },
   "Log4js": {

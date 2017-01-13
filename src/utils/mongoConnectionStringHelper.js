@@ -29,9 +29,13 @@ function getDbHostsString(hosts){
 
  exports.getMongoConnectionOptions = function(){
  	options = {
- 		"replSet" : {
- 			"readPreference" : "nearest",
- 			"connectWithNoPrimary" : true //read-only
+ 		replSet : {
+ 			readPreference : "secondary",
+ 			connectWithNoPrimary : true, //read-only
+ 			auto_reconnect : true,
+ 			slaveOk : true
  		}
- 	}
+ 	};
+
+ 	return options;
  }
