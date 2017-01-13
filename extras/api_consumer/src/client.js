@@ -141,6 +141,10 @@ function makePaymentRequest(complete, item, i){
  			paymentsIds.push(httpstring.message._id);
  			complete();
  		})
+ 		.catch(function (err, response, body){
+        	console.log(err);
+        	complete();
+        });
  }
 
 function makeEmployeeRequest(complete,item,i){
@@ -149,6 +153,10 @@ function makeEmployeeRequest(complete,item,i){
  			employeesIds.push(httpstring.message._id);
  			complete();
  		})
+ 		.catch(function (err, response, body){
+        	console.log(err);
+        	complete();
+        });
  }
 
 function makeProjectRequest(complete,item,i){
@@ -157,6 +165,10 @@ function makeProjectRequest(complete,item,i){
  			projectsIds.push(httpstring.message._id);
  			complete();
  		})
+ 		.catch(function (err, response, body){
+        	console.log(err);
+        	complete();
+        });
  }
 
  function makeAssignmentRequest(complete,item,i){
@@ -164,6 +176,10 @@ function makeProjectRequest(complete,item,i){
  		.then(function(httpstring){
  			complete();
  		})
+ 		.catch(function (err, response, body){
+        	console.log(err);
+        	complete();
+        });
  }
 
 
