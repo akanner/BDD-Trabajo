@@ -5,6 +5,21 @@ var bodyParser = require('body-parser');
 //Logger
 var myLogClass = require('./utils/logger');
 var logger = new myLogClass();
+//logueo de requerimientos
+var winston = require('winston');
+ var reqLogger = new (winston.Logger);
+/**
+* Requiring `winston-mongodb` will expose
+* `winston.transports.MongoDB`
+*/
+require('winston-mongodb').MongoDB;
+
+reqLogger.add(winston.transports.MongoDB, {db: mongooseUrlHelper.getMongoConnectionString() });
+reqLogger.stream = { 
+  write: function(message, encoding){ 
+    reqLogger.info(message); 
+  } 
+};
 var morgan = require('morgan');
 //express-validations
 var expressValidator = require('express-validator');
@@ -18,7 +33,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(expressValidator()); // this line must be immediately after any of the bodyParser middlewares!
-app.use(morgan('combined')); //log de request
+app.use(morgan('short',{ "stream": reqLogger.stream })); //log de request
 
 //crea el string de conexion de mongoDBs
 var urlMongoose = mongooseUrlHelper.getMongoConnectionString();

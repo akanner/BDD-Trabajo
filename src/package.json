@@ -10,13 +10,15 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "express-validator": "^3.1.0",
     "log4js": "^0.6.38",
     "mongo-sanitize": "^1.0.0",
     "mongoose": "4.5.9",
+    "mongoose-id-validator": "^0.4.0",
+    "mongoose-relationship": "0.1.5",
+    "morgan": "^1.7.0",
     "request": "^2.74.0",
-    "express-validator": "^3.1.0",
-    "morgan" : "^1.7.0",
-    "mongoose-id-validator" : "^0.4.0",
-    "mongoose-relationship" : "0.1.5"
+    "winston": "^2.3.0",
+    "winston-mongodb": "^2.0.7"
   }
 }
