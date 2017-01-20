@@ -23,17 +23,15 @@ function getDbHostsString(hosts){
  *
  */
  exports.getMongoConnectionString = function(){
- 	var mongoUrl = config.Mongo.client + "://" + getDbHostsString(config.Mongo.hosts) + "/" + config.Mongo.dbName + "?replicaSet=" + config.Mongo.replicaSet;
+ 	var mongoUrl = config.Mongo.client + "://" + getDbHostsString(config.Mongo.hosts) + "/" + config.Mongo.dbName + "?replicaSet=" + config.Mongo.replicaSet + "&readPreference=primaryPreferred";
  	return mongoUrl;
  }
 
  exports.getMongoConnectionOptions = function(){
  	options = {
  		replSet : {
- 			readPreference : "secondary",
  			connectWithNoPrimary : true, //read-only
  			auto_reconnect : true,
- 			slaveOk : true
  		}
  	};
 
