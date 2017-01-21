@@ -17,8 +17,6 @@
     "mongoose-id-validator": "^0.4.0",
     "mongoose-relationship": "0.1.5",
     "morgan": "^1.7.0",
-    "request": "^2.74.0",
-    "winston": "^2.3.0",
-    "winston-mongodb": "^2.0.7"
+    "request": "^2.74.0"
   }
 }
