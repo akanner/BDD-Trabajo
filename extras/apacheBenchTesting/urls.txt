@@ -1,0 +1,11 @@
+http://localhost:8000/api/assignment/;get
+http://localhost:8000/api/employee/;get
+http://localhost:8000/api/payment/;get
+http://localhost:8000/api/project/;get
+http://localhost:8000/api/payment/588556348928a0eb1082e26a;get
+http://localhost:8000/api/employee/588556548928a0eb1082e26c;get
+http://localhost:8000/api/project/5884252377af537911123507;get
+http://localhost:8000/api/assignment/588556ba8928a0eb1082e272;get
+http://localhost:8000/api/payment;post;-T application/json -p ./dataPost/post_title.json 
+http://localhost:8000/api/employee;post;-T application/json -p ./dataPost/post_employee.json 
+http://localhost:8000/api/project;post;-T application/json -p ./dataPost/post_project.json 
