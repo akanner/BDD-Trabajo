@@ -1,11 +1,8 @@
-http://localhost:8000/api/assignment/;get
-http://localhost:8000/api/employee/;get
-http://localhost:8000/api/payment/;get
-http://localhost:8000/api/project/;get
-http://localhost:8000/api/payment/588556348928a0eb1082e26a;get
-http://localhost:8000/api/employee/588556548928a0eb1082e26c;get
-http://localhost:8000/api/project/5884252377af537911123507;get
-http://localhost:8000/api/assignment/588556ba8928a0eb1082e272;get
 http://localhost:8000/api/payment;post;-T application/json -p ./dataPost/post_title.json 
 http://localhost:8000/api/employee;post;-T application/json -p ./dataPost/post_employee.json 
-http://localhost:8000/api/project;post;-T application/json -p ./dataPost/post_project.json 
+http://localhost:8000/api/project;post;-T application/json -p ./dataPost/post_project.json
+\http://localhost:8000/api/assignment;post;-T application/json -p ./dataPost/post_assignment.json  
+http://localhost:8000/api/payment/58864985487c47b00f2e68b6;put;-T application/json -u ./dataPut/put_title.json 
+http://localhost:8000/api/employee/58864993487c47b00f2e68b8;put;-T application/json -u ./dataPut/put_employee.json 
+http://localhost:8000/api/project/588649ce487c47b00f2e6a65;put;-T application/json -u ./dataPut/put_project.json
+http://localhost:8000/api/assignment/588649ce487c47b00f2e6b14;put;-T application/json -u ./dataPut/put_assignment.json

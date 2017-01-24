@@ -1,6 +1,6 @@
 {
 	"generatedEmployees" : 100000,
 	"generatedProjects" : 10000,
-	"generatedAssignations" : 10000,
-	"generatedPayments" : 100
+	"generatedAssignations" : 100000,
+	"generatedPayments" : 1000
 }

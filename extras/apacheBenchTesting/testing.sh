@@ -15,7 +15,7 @@ filename="$1"
 while read -r url method extraParams
 do
     printf "<h2>TESTING $method - $url</h2>"
-    parameters="-n 100 -c 10 -w"
+    parameters="-n 100 -c 10"
     if [[ !  -z  $extraParams ]]
     	then
     		parameters="$parameters $extraParams"
@@ -27,7 +27,7 @@ do
 	#-n 100 -c 10 -w -T application/json -p ./dataPost/post_title.json
 	#al no separar en espacios lo debe tomar como un solo parametro o lo debe eliminar del comando
 	
-    echo $(ab $parameters "${url}" | sed 1,7d) #elimina las primeras 7 lineas de header del reporte de apache bench
+    ab $parameters "${url}" | sed 1,7d #elimina las primeras 7 lineas de header del reporte de apache bench
     IFS=";"
 done < "$filename"
 
