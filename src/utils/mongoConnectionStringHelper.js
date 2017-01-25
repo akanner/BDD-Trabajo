@@ -32,6 +32,10 @@ function getDbHostsString(hosts){
  		replSet : {
  			connectWithNoPrimary : true, //read-only
  			auto_reconnect : true,
+ 		},
+ 		db: {
+ 			w: 1,
+ 			wtimeout: 5000,
  		}
  	};
 
