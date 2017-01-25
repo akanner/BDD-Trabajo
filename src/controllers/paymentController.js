@@ -170,7 +170,7 @@ function updatePayment(req,res)
  */
 function getPaymentAndProcessResult(id,res,callback)
 {
-    genericController.getEntityAndProcessResult(Payment,id,res,function(error,id,res){
+    genericController.getEntityAndProcessResult(Payment,id,res,function(err,id,res){
         logger.error("error obteniendo al sueldo con ID: " + id);
         logger.error(err.message);
         responseFormatter.send500Response(res,err.message);
