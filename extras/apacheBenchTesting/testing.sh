@@ -20,7 +20,6 @@ do
     	then
     		parameters="$parameters $extraParams"
 		fi
-		echo $parameters
 	IFS=$OIFS 
 	#algo raro pasa cuando el IFS es ;, el comando no se ejecuta con todos los parametros
 	#debe tener algo que ver con que $parameters es un string con espacios con todos los parametros

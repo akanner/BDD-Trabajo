@@ -1,0 +1,304 @@
+<h2>TESTING post - http://localhost:8000/api/payment</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/payment
+Document Length:        104 bytes
+
+Concurrency Level:      10
+Time taken for tests:   1.544 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      30700 bytes
+Total body sent:        18400
+HTML transferred:       10400 bytes
+Requests per second:    64.76 [#/sec] (mean)
+Time per request:       154.422 [ms] (mean)
+Time per request:       15.442 [ms] (mean, across all concurrent requests)
+Transfer rate:          19.41 [Kbytes/sec] received
+                        11.64 kb/s sent
+                        31.05 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.1      0       1
+Processing:    45  152 190.7     84     725
+Waiting:       43  151 190.6     83     723
+Total:         45  152 190.7     84     725
+
+Percentage of the requests served within a certain time (ms)
+  50%     84
+  66%     88
+  75%    101
+  80%    136
+  90%    697
+  95%    717
+  98%    724
+  99%    725
+ 100%    725 (longest request)
+<h2>TESTING post - http://localhost:8000/api/employee</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/employee
+Document Length:        124 bytes
+
+Concurrency Level:      10
+Time taken for tests:   0.486 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      32700 bytes
+Total body sent:        20500
+HTML transferred:       12400 bytes
+Requests per second:    205.90 [#/sec] (mean)
+Time per request:       48.568 [ms] (mean)
+Time per request:       4.857 [ms] (mean, across all concurrent requests)
+Transfer rate:          65.75 [Kbytes/sec] received
+                        41.22 kb/s sent
+                        106.97 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:    33   47   7.8     46      70
+Waiting:       32   46   7.8     45      70
+Total:         33   47   7.8     46      70
+
+Percentage of the requests served within a certain time (ms)
+  50%     46
+  66%     48
+  75%     50
+  80%     55
+  90%     59
+  95%     60
+  98%     70
+  99%     70
+ 100%     70 (longest request)
+<h2>TESTING post - http://localhost:8000/api/project</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/project
+Document Length:        155 bytes
+
+Concurrency Level:      10
+Time taken for tests:   0.395 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      35800 bytes
+Total body sent:        21800
+HTML transferred:       15500 bytes
+Requests per second:    253.11 [#/sec] (mean)
+Time per request:       39.509 [ms] (mean)
+Time per request:       3.951 [ms] (mean, across all concurrent requests)
+Transfer rate:          88.49 [Kbytes/sec] received
+                        53.88 kb/s sent
+                        142.37 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:    26   38   6.4     37      58
+Waiting:       25   38   6.4     36      57
+Total:         26   39   6.4     37      58
+
+Percentage of the requests served within a certain time (ms)
+  50%     37
+  66%     40
+  75%     43
+  80%     46
+  90%     50
+  95%     51
+  98%     52
+  99%     58
+ 100%     58 (longest request)
+<h2>TESTING post - http://localhost:8000/api/assignment</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/assignment
+Document Length:        187 bytes
+
+Concurrency Level:      10
+Time taken for tests:   5.168 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      39000 bytes
+Total body sent:        29000
+HTML transferred:       18700 bytes
+Requests per second:    19.35 [#/sec] (mean)
+Time per request:       516.798 [ms] (mean)
+Time per request:       51.680 [ms] (mean, across all concurrent requests)
+Transfer rate:          7.37 [Kbytes/sec] received
+                        5.48 kb/s sent
+                        12.85 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:   321  502 100.0    498     781
+Waiting:      320  501  99.9    495     780
+Total:        321  502 100.0    498     781
+
+Percentage of the requests served within a certain time (ms)
+  50%    498
+  66%    553
+  75%    565
+  80%    579
+  90%    641
+  95%    652
+  98%    739
+  99%    781
+ 100%    781 (longest request)
+<h2>TESTING put - http://localhost:8000/api/payment/5886ba4ddb5163eb18415e2d</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/payment/5886ba4ddb5163eb18415e2d
+Document Length:        97 bytes
+
+Concurrency Level:      10
+Time taken for tests:   0.345 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      29900 bytes
+Total body sent:        20100
+HTML transferred:       9700 bytes
+Requests per second:    289.44 [#/sec] (mean)
+Time per request:       34.549 [ms] (mean)
+Time per request:       3.455 [ms] (mean, across all concurrent requests)
+Transfer rate:          84.51 [Kbytes/sec] received
+                        56.81 kb/s sent
+                        141.33 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:    23   33   5.1     32      45
+Waiting:       23   32   5.3     31      44
+Total:         24   33   5.1     32      45
+
+Percentage of the requests served within a certain time (ms)
+  50%     32
+  66%     35
+  75%     37
+  80%     38
+  90%     41
+  95%     43
+  98%     45
+  99%     45
+ 100%     45 (longest request)
+<h2>TESTING put - http://localhost:8000/api/employee/5886ba73db5163eb1841ac49</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/employee/5886ba73db5163eb1841ac49
+Document Length:        124 bytes
+
+Concurrency Level:      10
+Time taken for tests:   0.472 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      32700 bytes
+Total body sent:        22900
+HTML transferred:       12400 bytes
+Requests per second:    211.70 [#/sec] (mean)
+Time per request:       47.238 [ms] (mean)
+Time per request:       4.724 [ms] (mean, across all concurrent requests)
+Transfer rate:          67.60 [Kbytes/sec] received
+                        47.34 kb/s sent
+                        114.94 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:    36   46   4.1     46      57
+Waiting:       36   45   4.1     45      56
+Total:         36   46   4.1     46      57
+
+Percentage of the requests served within a certain time (ms)
+  50%     46
+  66%     47
+  75%     48
+  80%     49
+  90%     51
+  95%     53
+  98%     56
+  99%     57
+ 100%     57 (longest request)
+<h2>TESTING put - http://localhost:8000/api/project/5886bbe2db5163eb1844b99f</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/project/5886bbe2db5163eb1844b99f
+Document Length:        155 bytes
+
+Concurrency Level:      10
+Time taken for tests:   0.342 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      35800 bytes
+Total body sent:        24200
+HTML transferred:       15500 bytes
+Requests per second:    292.05 [#/sec] (mean)
+Time per request:       34.240 [ms] (mean)
+Time per request:       3.424 [ms] (mean, across all concurrent requests)
+Transfer rate:          102.10 [Kbytes/sec] received
+                        69.02 kb/s sent
+                        171.13 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:    23   33   4.7     32      43
+Waiting:       23   31   4.9     30      42
+Total:         24   33   4.7     32      43
+
+Percentage of the requests served within a certain time (ms)
+  50%     32
+  66%     35
+  75%     38
+  80%     38
+  90%     39
+  95%     42
+  98%     43
+  99%     43
+ 100%     43 (longest request)
+<h2>TESTING put - http://localhost:8000/api/assignment/5886bd4edb5163eb1847c6b9</h2>Server Software:        
+Server Hostname:        localhost
+Server Port:            8000
+
+Document Path:          /api/assignment/5886bd4edb5163eb1847c6b9
+Document Length:        187 bytes
+
+Concurrency Level:      10
+Time taken for tests:   10.840 seconds
+Complete requests:      100
+Failed requests:        0
+Total transferred:      39000 bytes
+Total body sent:        31400
+HTML transferred:       18700 bytes
+Requests per second:    9.22 [#/sec] (mean)
+Time per request:       1084.024 [ms] (mean)
+Time per request:       108.402 [ms] (mean, across all concurrent requests)
+Transfer rate:          3.51 [Kbytes/sec] received
+                        2.83 kb/s sent
+                        6.34 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.0      0       0
+Processing:   623 1031 259.2    965    1780
+Waiting:      622 1030 259.1    964    1779
+Total:        623 1031 259.2    965    1780
+
+Percentage of the requests served within a certain time (ms)
+  50%    965
+  66%   1091
+  75%   1189
+  80%   1291
+  90%   1419
+  95%   1533
+  98%   1779
+  99%   1780
+ 100%   1780 (longest request)
