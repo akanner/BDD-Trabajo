@@ -95,10 +95,10 @@ config = {
 ##Generación de BD
 ```
 //levantar las replicas de mongo
-`sudo docker start -i mongo1`
-`sudo docker start -i mongo2`
-`sudo docker start -i mongo3`
-`sudo docker start -i arbiter`
+sudo docker start -i mongo1
+sudo docker start -i mongo2
+sudo docker start -i mongo3
+sudo docker start -i arbiter
 //levantar la API
 node server.js
 //levantar el cliente (en otra terminal)
