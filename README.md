@@ -29,10 +29,12 @@ sudo docker network create mongo-replicas-network
 
 ###creando las replicas
 **Cada replica en una terminal distinta**
-**Si los contenedores estan creadas se deben ejecutar de la siguiente manera **
+
+**Si los contenedores estan creados se deben ejecutar de la siguiente manera**
+
 `sudo docker start -i #nombrecontainer`
 
-**Si no estan creadas**
+**Si no estan creados**
 ```
 sudo docker run \
 -p 30001:27017 \
