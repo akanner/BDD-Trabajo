@@ -65,28 +65,7 @@ mongo mongod --replSet mongo-replicas-network
 ```
 docker exec -it mongo1 mongo
 #ejecutamos en mongo
-config = {
-  	"_id" : "mongo-replicas-network",
-  	"members" : [
-  		{
-  			"_id" : 0,
-  			"host" : "mongo1:27017"
-  		},
-  		{
-  			"_id" : 1,
-  			"host" : "mongo2:27017"
-  		},
-  		{
-  			"_id" : 2,
-  			"host" : "mongo3:27017"
-  		},
-  		{
-  			"_id" : 3,
-  			"host" : "arbiter:27017",
-  			"arbiterOnly" : true
-  		}
-  	]
-  }
+config = {"_id":"mongo-replicas-network","members":[{"_id":0,"host":"mongo1:27017"},{"_id":1,"host":"mongo2:27017"},{"_id":2,"host":"mongo3:27017"},{"_id":3,"host":"arbiter:27017","arbiterOnly":true}]}
   rs.initiate(config)
 
 ```
